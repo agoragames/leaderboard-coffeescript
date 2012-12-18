@@ -1,0 +1,31 @@
+{
+  "name": "leaderboard",
+  "version": "0.0.1",
+  "author": "David Czarnecki <me@davidczarnecki.com>",
+  "description": "Leaderboards backed by Redis in CoffeeScript",
+  "contributors": [ 
+    {
+      "name": "David Czarnecki",
+      "email": "me@davidczarnecki.com"
+    } 
+  ],
+  "main": "./lib/leaderboard",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/czarneckid/leaderboard-coffeescript.git"
+  },
+  "keywords": [
+    "leaderboard",
+    "redis"
+  ],
+  "dependencies": {
+    "redis": "0.8.2"
+  },
+  "devDependencies": {
+    "jasmine-node": "1.0.28"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=0.6"
+  }
+}
