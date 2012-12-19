@@ -117,6 +117,12 @@ describe 'Leaderboard', ->
     for index in [0...Leaderboard.DEFAULT_PAGE_SIZE + 1]
       @leaderboard.rank_member("member#{index}", index, null, (reply) -> )
 
+    @leaderboard.total_pages(5, (reply) ->
+      reply.should.equal(6))
+
+    @leaderboard.total_pages(null, (reply) ->
+      reply.should.equal(2))
+
     @leaderboard.total_pages(Leaderboard.DEFAULT_PAGE_SIZE, (reply) ->
       reply.should.equal(2)
       done())
