@@ -115,7 +115,7 @@ describe 'Leaderboard', ->
 
   it 'should return the correct total pages', (done) ->
     for index in [0...Leaderboard.DEFAULT_pageSize + 1]
-      @leaderboard.rankMember("member#{index}", index, null, (reply) -> )
+      @leaderboard.rankMember("member_#{index}", index, null, (reply) -> )
 
     @leaderboard.totalPages(5, (reply) ->
       reply.should.equal(6))
@@ -129,8 +129,38 @@ describe 'Leaderboard', ->
 
   it 'should return the correct number of members in a given score range', (done) ->
     for index in [0..5]
-      @leaderboard.rankMember("member#{index}", index, null, (reply) -> )
+      @leaderboard.rankMember("member_#{index}", index, null, (reply) -> )
 
     @leaderboard.totalMembersInScoreRange(2, 4, (reply) ->
       reply.should.equal(3)
+      done())
+
+  it 'should return the correct score for a member', (done) ->
+    @leaderboard.rankMember('member', 72.4, 'Optional member data', (reply) -> )
+
+    @leaderboard.scoreFor('david', (reply) ->
+      should_helper.not.exist(reply))
+
+    @leaderboard.scoreFor('member', (reply) -> 
+      parseFloat(reply).should.equal(72.4)
+      done())
+
+  it 'should return the correct rank for a member', (done) ->
+    for index in [0..5]
+      @leaderboard.rankMember("member_#{index}", index, null, (reply) -> )
+
+    @leaderboard.rankFor('member_4', (reply) ->
+      reply.should.equal(2)
+      done())
+
+  it 'should allow you to change the score for a member', (done) ->
+    @leaderboard.rankMember('member', 5, 'Optional member data', (reply) -> )
+    @leaderboard.scoreFor('member', (reply) ->
+      parseFloat(reply).should.equal(5))
+    @leaderboard.changeScoreFor('member', 5, (reply) -> )
+    @leaderboard.scoreFor('member', (reply) ->
+      parseFloat(reply).should.equal(10))
+    @leaderboard.changeScoreFor('member', -5, (reply) -> )
+    @leaderboard.scoreFor('member', (reply) ->
+      parseFloat(reply).should.equal(5)
       done())

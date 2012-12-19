@@ -106,6 +106,31 @@ class Leaderboard
     @redisConnection.zcount(leaderboardName, minScore, maxScore, (err, reply) ->
       callback(reply) if callback)
 
+  changeScoreFor: (member, delta, callback) ->
+    this.changeScoreForMemberIn(@leaderboardName, member, delta, callback)
+
+  changeScoreForMemberIn: (leaderboardName, member, delta, callback) ->
+    @redisConnection.zincrby(leaderboardName, delta, member, (err, reply) ->
+      callback(reply) if callback)
+
+  rankFor: (member, callback) ->
+    this.rankForIn(@leaderboardName, member, callback)
+
+  rankForIn: (leaderboardName, member, callback) ->
+    if @reverse
+      @redisConnection.zrank(leaderboardName, member, (err, reply) ->
+        callback(reply + 1) if callback and reply)
+    else
+      @redisConnection.zrevrank(leaderboardName, member, (err, reply) ->
+        callback(reply + 1) if callback and reply)
+
+  scoreFor: (member, callback) ->
+    this.scoreForIn(@leaderboardName, member, callback)
+
+  scoreForIn: (leaderboardName, member, callback) ->
+    @redisConnection.zscore(leaderboardName, member, (err, reply) ->
+      callback(reply) if callback)
+
   memberDataKey: (leaderboardName) ->
     "#{leaderboardName}:member_data"
 
