@@ -131,6 +131,13 @@ class Leaderboard
     @redisConnection.zscore(leaderboardName, member, (err, reply) ->
       callback(reply) if callback)
 
+  checkMember: (member, callback) ->
+    this.checkMemberIn(@leaderboardName, member, callback)
+
+  checkMemberIn: (leaderboardName, member, callback) ->
+    @redisConnection.zscore(leaderboardName, member, (err, reply) ->
+      callback(reply?) if callback)
+
   memberDataKey: (leaderboardName) ->
     "#{leaderboardName}:member_data"
 

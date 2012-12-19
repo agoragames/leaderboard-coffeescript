@@ -164,3 +164,12 @@ describe 'Leaderboard', ->
     @leaderboard.scoreFor('member', (reply) ->
       parseFloat(reply).should.equal(5)
       done())
+
+  it 'should allow you to check if a member exists', (done) ->
+    @leaderboard.rankMember('member', 10, 'Optional member data', (reply) -> )
+
+    @leaderboard.checkMember('member', (reply) ->
+      reply.should.be.true)
+    @leaderboard.checkMember('unknown', (reply) ->
+      reply.should.be.false
+      done())
