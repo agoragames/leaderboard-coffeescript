@@ -1,29 +1,29 @@
 describe 'Leaderboard', ->
   before ->
-    @redis_connection = redis.createClient(6379, 'localhost')
+    @redisConnection = redis.createClient(6379, 'localhost')
 
   beforeEach ->
     @leaderboard = new Leaderboard('highscores')
   
   afterEach ->
-    @redis_connection.flushdb()
+    @redisConnection.flushdb()
 
   it 'should initialize the leaderboard correctly', (done) ->
-    @leaderboard.leaderboard_name.should.equal('highscores')
+    @leaderboard.leaderboardName.should.equal('highscores')
     @leaderboard.reverse.should.be.false
-    @leaderboard.page_size.should.equal(Leaderboard.DEFAULT_PAGE_SIZE)
+    @leaderboard.pageSize.should.equal(Leaderboard.DEFAULT_pageSize)
 
     done()
 
   it 'should initialize the leaderboard correctly with options', (done) ->
     updated_options = 
-      'page_size': -1
+      'pageSize': -1
       'reverse': true
 
     @leaderboard = new Leaderboard('highscores', updated_options)
-    @leaderboard.leaderboard_name.should.equal('highscores')
+    @leaderboard.leaderboardName.should.equal('highscores')
     @leaderboard.reverse.should.be.true
-    @leaderboard.page_size.should.equal(Leaderboard.DEFAULT_PAGE_SIZE)
+    @leaderboard.pageSize.should.equal(Leaderboard.DEFAULT_pageSize)
 
     done()
 
@@ -32,97 +32,97 @@ describe 'Leaderboard', ->
     done()
 
   it 'should allow you to delete a leaderboard', (done) ->
-    @leaderboard.rank_member('member', 1, 'Optional member data', (reply) -> )
-    @leaderboard.redis_connection.exists('highscores', (err, reply) ->
+    @leaderboard.rankMember('member', 1, 'Optional member data', (reply) -> )
+    @leaderboard.redisConnection.exists('highscores', (err, reply) ->
       reply.should.equal(1))
-    @leaderboard.redis_connection.exists('highscores:member_data', (err, reply) ->
+    @leaderboard.redisConnection.exists('highscores:member_data', (err, reply) ->
       reply.should.equal(1))
-    @leaderboard.delete_leaderboard((reply) -> )
-    @leaderboard.redis_connection.exists('highscores', (err, reply) ->
+    @leaderboard.deleteLeaderboard((reply) -> )
+    @leaderboard.redisConnection.exists('highscores', (err, reply) ->
       reply.should.equal(0))
-    @leaderboard.redis_connection.exists('highscores:member_data', (err, reply) ->
+    @leaderboard.redisConnection.exists('highscores:member_data', (err, reply) ->
       reply.should.equal(0))
 
     done()
 
   it 'should return the total number of members in the leaderboard', (done) ->
-    @leaderboard.total_members((reply) ->
+    @leaderboard.totalMembers((reply) ->
       reply.should.equal(0)
       done())
 
   it 'should allow you to rank a member in the leaderboard and see that reflected in total members', (done) ->
-    @leaderboard.rank_member('member', 1, null, (reply) -> )
+    @leaderboard.rankMember('member', 1, null, (reply) -> )
 
-    @leaderboard.total_members((reply) ->
+    @leaderboard.totalMembers((reply) ->
       reply.should.equal(1)
       done())
 
   it 'should allow you to rank a member in the leaderboard with optional member data and see that reflected in total members', (done) ->
-    @leaderboard.rank_member('member', 1, 'Optional member data', (reply) -> )
+    @leaderboard.rankMember('member', 1, 'Optional member data', (reply) -> )
 
-    @leaderboard.total_members((reply) ->
+    @leaderboard.totalMembers((reply) ->
       reply.should.equal(1))
     
-    @leaderboard.member_data_for('member', (reply) ->
+    @leaderboard.memberDataFor('member', (reply) ->
       reply.should.equal('Optional member data')
       done())
 
   it 'should allow you to retrieve optional member data', (done) ->
-    @leaderboard.rank_member('member', 1, 'Optional member data', (reply) -> )
+    @leaderboard.rankMember('member', 1, 'Optional member data', (reply) -> )
 
-    @leaderboard.member_data_for('member', (reply) ->
+    @leaderboard.memberDataFor('member', (reply) ->
       reply.should.equal('Optional member data')
       done())
 
   it 'should allow you to update optional member data', (done) ->
-    @leaderboard.rank_member('member', 1, 'Optional member data', (reply) -> )
+    @leaderboard.rankMember('member', 1, 'Optional member data', (reply) -> )
 
-    @leaderboard.member_data_for('member', (reply) ->
+    @leaderboard.memberDataFor('member', (reply) ->
       reply.should.equal('Optional member data'))
 
-    @leaderboard.update_member_data('member', 'Updated member data', (reply) -> )
+    @leaderboard.updateMemberData('member', 'Updated member data', (reply) -> )
 
-    @leaderboard.member_data_for('member', (reply) ->
+    @leaderboard.memberDataFor('member', (reply) ->
       reply.should.equal('Updated member data')
       done())
 
   it 'should allow you to remove optional member data', (done) ->
-    @leaderboard.rank_member('member', 1, 'Optional member data', (reply) -> )
+    @leaderboard.rankMember('member', 1, 'Optional member data', (reply) -> )
 
-    @leaderboard.member_data_for('member', (reply) ->
+    @leaderboard.memberDataFor('member', (reply) ->
       reply.should.equal('Optional member data'))
 
-    @leaderboard.remove_member_data('member', (reply) -> )
+    @leaderboard.removeMemberData('member', (reply) -> )
 
-    @leaderboard.member_data_for('member', (reply) ->
+    @leaderboard.memberDataFor('member', (reply) ->
       should_helper.not.exist(reply)
       done())
 
   it 'should allow you to remove a member', (done) ->
-    @leaderboard.rank_member('member', 1, 'Optional member data', (reply) -> )
+    @leaderboard.rankMember('member', 1, 'Optional member data', (reply) -> )
 
-    @leaderboard.member_data_for('member', (reply) ->
+    @leaderboard.memberDataFor('member', (reply) ->
       reply.should.equal('Optional member data'))
 
-    @leaderboard.remove_member('member', (reply) -> )
+    @leaderboard.removeMember('member', (reply) -> )
 
-    @leaderboard.total_members((reply) ->
+    @leaderboard.totalMembers((reply) ->
       reply.should.equal(0))
 
-    @leaderboard.member_data_for('member', (reply) ->
+    @leaderboard.memberDataFor('member', (reply) ->
       should_helper.not.exist(reply)
       done())
 
   it 'should return the correct total pages', (done) ->
-    for index in [0...Leaderboard.DEFAULT_PAGE_SIZE + 1]
-      @leaderboard.rank_member("member#{index}", index, null, (reply) -> )
+    for index in [0...Leaderboard.DEFAULT_pageSize + 1]
+      @leaderboard.rankMember("member#{index}", index, null, (reply) -> )
 
-    @leaderboard.total_pages(5, (reply) ->
+    @leaderboard.totalPages(5, (reply) ->
       reply.should.equal(6))
 
-    @leaderboard.total_pages(null, (reply) ->
+    @leaderboard.totalPages(null, (reply) ->
       reply.should.equal(2))
 
-    @leaderboard.total_pages(Leaderboard.DEFAULT_PAGE_SIZE, (reply) ->
+    @leaderboard.totalPages(Leaderboard.DEFAULT_pageSize, (reply) ->
       reply.should.equal(2)
       done())

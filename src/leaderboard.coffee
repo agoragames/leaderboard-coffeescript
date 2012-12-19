@@ -1,10 +1,10 @@
 redis = require 'redis'
 
 class Leaderboard
-  @DEFAULT_PAGE_SIZE = 25
+  @DEFAULT_pageSize = 25
 
   DEFAULT_OPTIONS = 
-    'page_size': @DEFAULT_PAGE_SIZE
+    'pageSize': @DEFAULT_pageSize
     'reverse': false
 
   @DEFAULT_REDIS_HOST = 'localhost'
@@ -15,91 +15,91 @@ class Leaderboard
     'host': @DEFAULT_REDIS_HOST
     'port': @DEFAULT_REDIS_PORT
 
-  constructor: (@leaderboard_name, options = DEFAULT_OPTIONS, redis_options = DEFAULT_REDIS_OPTIONS) ->
+  constructor: (@leaderboardName, options = DEFAULT_OPTIONS, redisOptions = DEFAULT_REDIS_OPTIONS) ->
     @reverse = options['reverse']
-    @page_size = options['page_size']
-    if @page_size == null || @page_size < 1
-      @page_size = Leaderboard.DEFAULT_PAGE_SIZE
+    @pageSize = options['pageSize']
+    if @pageSize == null || @pageSize < 1
+      @pageSize = Leaderboard.DEFAULT_pageSize
 
-    @redis_connection = redis_options['redis_connection']
+    @redisConnection = redisOptions['redis_connection']
 
-    if @redis_connection?
-      delete redis_options['redis_connection']
+    if @redisConnection?
+      delete redisOptions['redis_connection']
 
-    @redis_connection = redis.createClient(redis_options['port'], redis_options['host']) unless @redis_connection?
+    @redisConnection = redis.createClient(redisOptions['port'], redisOptions['host']) unless @redisConnection?
 
   disconnect: ->
-    @redis_connection.quit((err, reply) -> )
+    @redisConnection.quit((err, reply) -> )
 
-  delete_leaderboard: (callback) ->
-    this.delete_leaderboard_named(@leaderboard_name, callback)
+  deleteLeaderboard: (callback) ->
+    this.deleteLeaderboardNamed(@leaderboardName, callback)
 
-  delete_leaderboard_named: (leaderboard_name, callback) ->
-    transaction = @redis_connection.multi()
-    transaction.del(leaderboard_name)
-    transaction.del(this.member_data_key(leaderboard_name))
+  deleteLeaderboardNamed: (leaderboardName, callback) ->
+    transaction = @redisConnection.multi()
+    transaction.del(leaderboardName)
+    transaction.del(this.memberDataKey(leaderboardName))
     transaction.exec((err, reply) ->
       callback(reply) if callback)
 
-  rank_member: (member, score, member_data = null, callback) ->
-    this.rank_member_in(@leaderboard_name, member, score, member_data, callback)
+  rankMember: (member, score, member_data = null, callback) ->
+    this.rankMemberIn(@leaderboardName, member, score, member_data, callback)
 
-  rank_member_in: (leaderboard_name, member, score, member_data = null, callback) ->
-    transaction = @redis_connection.multi()
-    transaction.zadd(leaderboard_name, score, member)
-    transaction.hset(this.member_data_key(leaderboard_name), member, member_data) if member_data?
+  rankMemberIn: (leaderboardName, member, score, member_data = null, callback) ->
+    transaction = @redisConnection.multi()
+    transaction.zadd(leaderboardName, score, member)
+    transaction.hset(this.memberDataKey(leaderboardName), member, member_data) if member_data?
     transaction.exec((err, reply) ->
       callback(reply) if callback)
 
-  member_data_for: (member, callback) ->
-    this.member_data_for_in(@leaderboard_name, member, callback)
+  memberDataFor: (member, callback) ->
+    this.memberDataForIn(@leaderboardName, member, callback)
 
-  member_data_for_in: (leaderboard_name, member, callback) ->
-    @redis_connection.hget(this.member_data_key(leaderboard_name), member, (err, reply) ->
+  memberDataForIn: (leaderboardName, member, callback) ->
+    @redisConnection.hget(this.memberDataKey(leaderboardName), member, (err, reply) ->
       callback(reply) if callback)
 
-  update_member_data: (member, member_data, callback) ->
-    this.update_member_data_for(@leaderboard_name, member, member_data, callback)
+  updateMemberData: (member, member_data, callback) ->
+    this.updateMemberDataFor(@leaderboardName, member, member_data, callback)
 
-  update_member_data_for: (leaderboard_name, member, member_data, callback) ->
-    @redis_connection.hset(this.member_data_key(leaderboard_name), member, member_data, (err, reply) ->
+  updateMemberDataFor: (leaderboardName, member, member_data, callback) ->
+    @redisConnection.hset(this.memberDataKey(leaderboardName), member, member_data, (err, reply) ->
       callback(reply) if callback)
 
-  remove_member_data: (member, callback) ->
-    this.remove_member_data_for(@leaderboard_name, member, callback)
+  removeMemberData: (member, callback) ->
+    this.remberMemberDataFor(@leaderboardName, member, callback)
 
-  remove_member_data_for: (leaderboard_name, member, callback) ->
-    @redis_connection.hdel(this.member_data_key(leaderboard_name), member, (err, reply) ->
+  remberMemberDataFor: (leaderboardName, member, callback) ->
+    @redisConnection.hdel(this.memberDataKey(leaderboardName), member, (err, reply) ->
       callback(reply) if callback)
 
-  remove_member: (member, callback) ->
-    this.remove_member_from(@leaderboard_name, member, callback)
+  removeMember: (member, callback) ->
+    this.removeMemberFrom(@leaderboardName, member, callback)
 
-  remove_member_from: (leaderboard_name, member, callback) ->
-    transaction = @redis_connection.multi()
-    transaction.zrem(leaderboard_name, member)
-    transaction.hdel(this.member_data_key(leaderboard_name), member)
+  removeMemberFrom: (leaderboardName, member, callback) ->
+    transaction = @redisConnection.multi()
+    transaction.zrem(leaderboardName, member)
+    transaction.hdel(this.memberDataKey(leaderboardName), member)
     transaction.exec((err, reply) ->
       callback(reply) if callback)
 
-  total_members: (callback) ->
-    this.total_members_in(@leaderboard_name, callback)
+  totalMembers: (callback) ->
+    this.totalMembersIn(@leaderboardName, callback)
 
-  total_members_in: (leaderboard_name, callback) ->
-    @redis_connection.zcard(leaderboard_name, (err, reply) ->
+  totalMembersIn: (leaderboardName, callback) ->
+    @redisConnection.zcard(leaderboardName, (err, reply) ->
       callback(reply) if callback)
 
-  total_pages: (page_size = null, callback) ->
-    this.total_pages_in(@leaderboard_name, page_size, callback)
+  totalPages: (pageSize = null, callback) ->
+    this.totalPagesIn(@leaderboardName, pageSize, callback)
 
-  total_pages_in: (leaderboard_name, page_size = null, callback) ->
-    unless page_size?
-      page_size = @page_size
+  totalPagesIn: (leaderboardName, pageSize = null, callback) ->
+    unless pageSize?
+      pageSize = @pageSize
 
-    @redis_connection.zcard(leaderboard_name, (err, reply) ->
-      callback(Math.ceil(reply / page_size)))
+    @redisConnection.zcard(leaderboardName, (err, reply) ->
+      callback(Math.ceil(reply / pageSize)))
 
-  member_data_key: (leaderboard_name) ->
-    "#{leaderboard_name}:member_data"
+  memberDataKey: (leaderboardName) ->
+    "#{leaderboardName}:member_data"
 
 module.exports = Leaderboard
