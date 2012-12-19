@@ -65,6 +65,13 @@ class Leaderboard
     @redis_connection.hset(this.member_data_key(leaderboard_name), member, member_data, (err, reply) ->
       callback(reply) if callback)
 
+  remove_member_data: (member, callback) ->
+    this.remove_member_data_for(@leaderboard_name, member, callback)
+
+  remove_member_data_for: (leaderboard_name, member, callback) ->
+    @redis_connection.hdel(this.member_data_key(leaderboard_name), member, (err, reply) ->
+      callback(reply) if callback)
+
   total_members: (callback) ->
     this.total_members_in(@leaderboard_name, callback)
 

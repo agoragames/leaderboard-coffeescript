@@ -1,5 +1,5 @@
 require('coffee-script');
-should = require('should');
+should_helper = require('should');
 redis = require('redis');
 
 Leaderboard = require('../lib/leaderboard');

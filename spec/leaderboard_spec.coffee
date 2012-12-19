@@ -85,3 +85,15 @@ describe 'Leaderboard', ->
     @leaderboard.member_data_for('member', (reply) ->
       reply.should.equal('Updated member data')
       done())
+
+  it 'should allow you to remove optional member data', (done) ->
+    @leaderboard.rank_member('member', 1, 'Optional member data', (reply) -> )
+
+    @leaderboard.member_data_for('member', (reply) ->
+      reply.should.equal('Optional member data'))
+
+    @leaderboard.remove_member_data('member', (reply) -> )
+
+    @leaderboard.member_data_for('member', (reply) ->
+      should_helper.not.exist(reply)
+      done())
