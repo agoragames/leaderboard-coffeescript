@@ -28,6 +28,19 @@ class Leaderboard
 
     @redis_connection = redis.createClient(redis_options['port'], redis_options['host']) unless @redis_connection?
 
+  disconnect: ->
+    @redis_connection.quit((err, reply) -> )
+
+  delete_leaderboard: (callback) ->
+    this.delete_leaderboard_named(@leaderboard_name, callback)
+
+  delete_leaderboard_named: (leaderboard_name, callback) ->
+    transaction = @redis_connection.multi()
+    transaction.del(leaderboard_name)
+    transaction.del(this.member_data_key(leaderboard_name))
+    transaction.exec((err, reply) ->
+      callback(reply) if callback)
+
   rank_member: (member, score, member_data = null, callback) ->
     this.rank_member_in(@leaderboard_name, member, score, member_data, callback)
 
@@ -43,6 +56,13 @@ class Leaderboard
 
   member_data_for_in: (leaderboard_name, member, callback) ->
     @redis_connection.hget(this.member_data_key(leaderboard_name), member, (err, reply) ->
+      callback(reply) if callback)
+
+  update_member_data: (member, member_data, callback) ->
+    this.update_member_data_for(@leaderboard_name, member, member_data, callback)
+
+  update_member_data_for: (leaderboard_name, member, member_data, callback) ->
+    @redis_connection.hset(this.member_data_key(leaderboard_name), member, member_data, (err, reply) ->
       callback(reply) if callback)
 
   total_members: (callback) ->
