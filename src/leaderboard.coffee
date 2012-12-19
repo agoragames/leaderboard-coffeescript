@@ -51,6 +51,12 @@ class Leaderboard
     transaction.exec((err, reply) ->
       callback(reply) if callback)
 
+  # rankMemberIf
+  # rankMemberIfIn
+
+  # rankMembers
+  # rankMembersIn
+
   memberDataFor: (member, callback) ->
     this.memberDataForIn(@leaderboardName, member, callback)
 
@@ -167,6 +173,26 @@ class Leaderboard
 
   removeMembersInScoreRangeIn: (leaderboardName, minScore, maxScore, callback) ->
     @redisConnection.zremrangebyscore(leaderboardName, minScore, maxScore, (err, reply) ->
+      callback(reply) if callback)
+
+  # percentileFor
+  # percentileForIn
+
+  # pageFor
+  # pageForIn
+
+  expireLeaderboard: (seconds, callback) ->
+    this.expireLeaderboardFor(@leaderboardName, seconds, callback)
+
+  expireLeaderboardFor: (leaderboardName, seconds, callback) ->
+    @redisConnection.expire(leaderboardName, seconds, (err, reply) ->
+      callback(reply) if callback)
+
+  expireLeaderboardAt: (timestamp, callback) ->
+    this.expireLeaderboardAtFor(@leaderboardName, timestamp, callback)
+
+  expireLeaderboardAtFor: (leaderboardName, timestamp, callback) ->
+    @redisConnection.expireat(leaderboardName, timestamp, (err, reply) ->
       callback(reply) if callback)
 
   memberDataKey: (leaderboardName) ->
