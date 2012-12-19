@@ -138,6 +138,30 @@ class Leaderboard
     @redisConnection.zscore(leaderboardName, member, (err, reply) ->
       callback(reply?) if callback)
 
+  scoreAndRankFor: (member, callback) ->
+    this.scoreAndRankForIn(@leaderboardName, member, callback)
+
+  scoreAndRankForIn: (leaderboardName, member, callback) ->
+    transaction = @redisConnection.multi()
+    transaction.zscore(leaderboardName, member)
+    if @reverse
+      transaction.zrank(leaderboardName, member)
+    else
+      transaction.zrevrank(leaderboardName, member)
+    transaction.exec((err, replies) ->
+      if replies
+        scoreAndRankData = {}
+        if replies[0]?
+          scoreAndRankData['score'] = parseFloat(replies[0])
+        else
+          scoreAndRankData['score'] = null
+        if replies[1]?
+          scoreAndRankData['rank'] = replies[1] + 1
+        else
+          scoreAndRankData['rank'] = null
+        scoreAndRankData['member'] = member
+        callback(scoreAndRankData))    
+
   memberDataKey: (leaderboardName) ->
     "#{leaderboardName}:member_data"
 

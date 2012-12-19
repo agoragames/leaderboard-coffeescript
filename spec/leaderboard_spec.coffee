@@ -151,7 +151,7 @@ describe 'Leaderboard', ->
 
     @leaderboard.rankFor('unknown', (reply) -> 
       should_helper.not.exist(reply))
-    
+
     @leaderboard.rankFor('member_4', (reply) ->
       reply.should.equal(2)
       done())
@@ -175,4 +175,18 @@ describe 'Leaderboard', ->
       reply.should.be.true)
     @leaderboard.checkMember('unknown', (reply) ->
       reply.should.be.false
+      done())
+
+  it 'should return the correct score and rank', (done) ->
+    @leaderboard.rankMember('member', 10, 'Optional member data', (reply) -> )
+
+    @leaderboard.scoreAndRankFor('unknown', (reply) ->
+      should_helper.not.exist(reply['score'])
+      should_helper.not.exist(reply['rank'])
+      reply['member'].should.equal('unknown'))
+
+    @leaderboard.scoreAndRankFor('member', (reply) ->
+      reply['score'].should.equal(10)
+      reply['rank'].should.equal(1)
+      reply['member'].should.equal('member')
       done())
