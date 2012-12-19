@@ -190,3 +190,23 @@ describe 'Leaderboard', ->
       reply['rank'].should.equal(1)
       reply['member'].should.equal('member')
       done())
+
+  it 'should allow you to remove members in a given score range', (done) ->
+    for index in [0...5]
+      @leaderboard.rankMember("member_#{index}", index, null, (reply) -> )
+
+    @leaderboard.totalMembers((reply) ->
+      reply.should.equal(5))
+
+    @leaderboard.rankMember('cheater_1', 100, 'Optional member data', (reply) -> )
+    @leaderboard.rankMember('cheater_2', 101, 'Optional member data', (reply) -> )
+    @leaderboard.rankMember('cheater_3', 102, 'Optional member data', (reply) -> )
+
+    @leaderboard.totalMembers((reply) ->
+      reply.should.equal(8))
+
+    @leaderboard.removeMembersInScoreRange(100, 102)
+
+    @leaderboard.totalMembers((reply) ->
+      reply.should.equal(5)
+      done())

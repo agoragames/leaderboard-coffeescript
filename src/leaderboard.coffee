@@ -160,7 +160,14 @@ class Leaderboard
         else
           scoreAndRankData['rank'] = null
         scoreAndRankData['member'] = member
-        callback(scoreAndRankData))    
+        callback(scoreAndRankData) if callback)
+
+  removeMembersInScoreRange: (minScore, maxScore, callback) ->
+    this.removeMembersInScoreRangeIn(@leaderboardName, minScore, maxScore)
+
+  removeMembersInScoreRangeIn: (leaderboardName, minScore, maxScore, callback) ->
+    @redisConnection.zremrangebyscore(leaderboardName, minScore, maxScore, (err, reply) ->
+      callback(reply) if callback)
 
   memberDataKey: (leaderboardName) ->
     "#{leaderboardName}:member_data"
