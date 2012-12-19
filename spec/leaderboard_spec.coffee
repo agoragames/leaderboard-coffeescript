@@ -149,6 +149,9 @@ describe 'Leaderboard', ->
     for index in [0..5]
       @leaderboard.rankMember("member_#{index}", index, null, (reply) -> )
 
+    @leaderboard.rankFor('unknown', (reply) -> 
+      should_helper.not.exist(reply))
+    
     @leaderboard.rankFor('member_4', (reply) ->
       reply.should.equal(2)
       done())
