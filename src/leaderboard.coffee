@@ -89,6 +89,16 @@ class Leaderboard
     @redis_connection.zcard(leaderboard_name, (err, reply) ->
       callback(reply) if callback)
 
+  total_pages: (page_size = null, callback) ->
+    this.total_pages_in(@leaderboard_name, page_size, callback)
+
+  total_pages_in: (leaderboard_name, page_size = null, callback) ->
+    unless page_size?
+      page_size = @page_size
+
+    @redis_connection.zcard(leaderboard_name, (err, reply) ->
+      callback(Math.ceil(reply / page_size)))
+
   member_data_key: (leaderboard_name) ->
     "#{leaderboard_name}:member_data"
 

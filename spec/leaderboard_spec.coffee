@@ -112,3 +112,11 @@ describe 'Leaderboard', ->
     @leaderboard.member_data_for('member', (reply) ->
       should_helper.not.exist(reply)
       done())
+
+  it 'should return the correct total pages', (done) ->
+    for index in [0...Leaderboard.DEFAULT_PAGE_SIZE + 1]
+      @leaderboard.rank_member("member#{index}", index, null, (reply) -> )
+
+    @leaderboard.total_pages(Leaderboard.DEFAULT_PAGE_SIZE, (reply) ->
+      reply.should.equal(2)
+      done())
