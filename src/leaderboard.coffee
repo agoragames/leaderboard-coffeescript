@@ -99,6 +99,13 @@ class Leaderboard
     @redisConnection.zcard(leaderboardName, (err, reply) ->
       callback(Math.ceil(reply / pageSize)))
 
+  totalMembersInScoreRange: (minScore, maxScore, callback) ->
+    this.totalMembersInScoreRangeIn(@leaderboardName, minScore, maxScore, callback)
+
+  totalMembersInScoreRangeIn: (leaderboardName, minScore, maxScore, callback) ->
+    @redisConnection.zcount(leaderboardName, minScore, maxScore, (err, reply) ->
+      callback(reply) if callback)
+
   memberDataKey: (leaderboardName) ->
     "#{leaderboardName}:member_data"
 

@@ -126,3 +126,11 @@ describe 'Leaderboard', ->
     @leaderboard.totalPages(Leaderboard.DEFAULT_pageSize, (reply) ->
       reply.should.equal(2)
       done())
+
+  it 'should return the correct number of members in a given score range', (done) ->
+    for index in [0..5]
+      @leaderboard.rankMember("member#{index}", index, null, (reply) -> )
+
+    @leaderboard.totalMembersInScoreRange(2, 4, (reply) ->
+      reply.should.equal(3)
+      done())
