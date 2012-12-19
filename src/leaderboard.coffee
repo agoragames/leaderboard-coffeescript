@@ -72,6 +72,16 @@ class Leaderboard
     @redis_connection.hdel(this.member_data_key(leaderboard_name), member, (err, reply) ->
       callback(reply) if callback)
 
+  remove_member: (member, callback) ->
+    this.remove_member_from(@leaderboard_name, member, callback)
+
+  remove_member_from: (leaderboard_name, member, callback) ->
+    transaction = @redis_connection.multi()
+    transaction.zrem(leaderboard_name, member)
+    transaction.hdel(this.member_data_key(leaderboard_name), member)
+    transaction.exec((err, reply) ->
+      callback(reply) if callback)
+
   total_members: (callback) ->
     this.total_members_in(@leaderboard_name, callback)
 

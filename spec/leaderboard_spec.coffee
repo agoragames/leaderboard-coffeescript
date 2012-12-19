@@ -97,3 +97,18 @@ describe 'Leaderboard', ->
     @leaderboard.member_data_for('member', (reply) ->
       should_helper.not.exist(reply)
       done())
+
+  it 'should allow you to remove a member', (done) ->
+    @leaderboard.rank_member('member', 1, 'Optional member data', (reply) -> )
+
+    @leaderboard.member_data_for('member', (reply) ->
+      reply.should.equal('Optional member data'))
+
+    @leaderboard.remove_member('member', (reply) -> )
+
+    @leaderboard.total_members((reply) ->
+      reply.should.equal(0))
+
+    @leaderboard.member_data_for('member', (reply) ->
+      should_helper.not.exist(reply)
+      done())
