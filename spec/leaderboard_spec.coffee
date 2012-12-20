@@ -231,3 +231,17 @@ describe 'Leaderboard', ->
     @leaderboard.redisConnection.ttl(@leaderboard.leaderboardName, (err, reply) ->
       reply.should.be.above(0).and.below(11)
       done())
+
+  it 'should return the correct list when calling leaders', (done) ->
+    for index in [0..25]
+      @leaderboard.rankMember("member_#{index}", index, "Optional member data for member #{index}", (reply) -> )
+
+    @leaderboard.totalMembers((reply) ->
+      reply.should.equal(26))
+
+    @leaderboard.leaders(1, null, (reply) ->
+      reply.length.should.equal(25))
+
+    @leaderboard.leaders(2, null, (reply) ->
+      reply.length.should.equal(1)
+      done())

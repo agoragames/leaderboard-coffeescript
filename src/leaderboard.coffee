@@ -60,7 +60,7 @@ class Leaderboard
   memberDataFor: (member, callback) ->
     this.memberDataForIn(@leaderboardName, member, callback)
 
-  memberDataForIn: (leaderboardName, member, callback) ->
+  memberDataForIn: (leaderboardName, member, callback = ->) ->
     @redisConnection.hget(this.memberDataKey(leaderboardName), member, (err, reply) ->
       callback(reply) if callback)
 
@@ -194,6 +194,60 @@ class Leaderboard
   expireLeaderboardAtFor: (leaderboardName, timestamp, callback) ->
     @redisConnection.expireat(leaderboardName, timestamp, (err, reply) ->
       callback(reply) if callback)
+
+  rankedInList: (members, options = {}, callback) ->
+    this.rankedInListIn(@leaderboardName, members, options, callback)
+
+  rankedInListIn: (leaderboardName, members, options = {}, callback) ->
+    ranksForMembers = []
+    transaction = @redisConnection.multi()
+    for member in members
+      if @reverse
+        transaction.zrank(@leaderboardName, member)
+      else
+        transaction.zrevrank(@leaderboardName, member)
+      transaction.zscore(@leaderboardName, member)
+
+    transaction.exec((err, replies) =>
+      for member, index in members
+        data = {}
+        data['member'] = member
+        data['rank'] = replies[index * 2] + 1
+        data['score'] = replies[index * 2 + 1]        
+        
+        # Retrieve optional member data based on options['with_member_data']
+
+        ranksForMembers.push(data)
+
+      # Sort results based on options['sort_by']
+
+      callback(ranksForMembers) if callback
+    )
+    
+  leaders: (currentPage, options = {}, callback) ->
+    this.leadersIn(@leaderboardName, currentPage, options, callback)
+
+  leadersIn: (leaderboardName, currentPage, options = {}, callback) ->
+    currentPage = 1 if currentPage < 1
+    pageSize = options['page_size'] || @pageSize
+
+    this.totalPages(pageSize, (totalPages) =>
+      if currentPage > totalPages
+        currentPage = totalPages
+
+      indexForRedis = currentPage - 1
+      startingOffset = (indexForRedis * pageSize)
+      endingOffset = (startingOffset + pageSize) - 1
+
+      if @reverse
+        @redisConnection.zrange(leaderboardName, startingOffset, endingOffset, (err, reply) =>          
+          this.rankedInListIn(@leaderboardName, reply, options, callback)
+        )
+      else
+        @redisConnection.zrevrange(leaderboardName, startingOffset, endingOffset, (err, reply) =>
+          this.rankedInListIn(@leaderboardName, reply, options, callback)
+        )
+    )
 
   memberDataKey: (leaderboardName) ->
     "#{leaderboardName}:member_data"
