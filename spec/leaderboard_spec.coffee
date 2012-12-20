@@ -239,9 +239,9 @@ describe 'Leaderboard', ->
     @leaderboard.totalMembers((reply) ->
       reply.should.equal(26))
 
-    @leaderboard.leaders(1, null, (reply) ->
+    @leaderboard.leaders(1, {'with_member_data': true}, (reply) ->
       reply.length.should.equal(25))
 
-    @leaderboard.leaders(2, null, (reply) ->
+    @leaderboard.leaders(2, {'with_member_data': true}, (reply) ->
       reply.length.should.equal(1)
       done())

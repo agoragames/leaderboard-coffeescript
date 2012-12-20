@@ -210,14 +210,18 @@ class Leaderboard
 
     transaction.exec((err, replies) =>
       for member, index in members
-        data = {}
-        data['member'] = member
-        data['rank'] = replies[index * 2] + 1
-        data['score'] = replies[index * 2 + 1]        
-        
-        # Retrieve optional member data based on options['with_member_data']
+        do (member) =>
+          data = {}
+          data['member'] = member
+          data['rank'] = replies[index * 2] + 1
+          data['score'] = replies[index * 2 + 1]        
 
-        ranksForMembers.push(data)
+          # Retrieve optional member data based on options['with_member_data']
+          if options['with_member_data']
+            # Pull in the bits
+            true
+
+          ranksForMembers.push(data)
 
       # Sort results based on options['sort_by']
 
