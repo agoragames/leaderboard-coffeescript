@@ -193,8 +193,25 @@ class Leaderboard
               callback(percentile)
         )
     )
-  # pageFor
-  # pageForIn
+
+  pageFor: (member, pageSize = @DEFAULT_PAGE_SIZE, callback) ->
+    this.pageForIn(@leaderboardName, member, pageSize, callback)
+
+  pageForIn: (leaderboardName, member, pageSize = @DEFAULT_PAGE_SIZE, callback) ->
+    transaction = @redisConnection.multi()
+    if @reverse
+      transaction.zrank(leaderboardName, member)
+    else
+      transaction.zrevrank(leaderboardName, member)
+    transaction.exec((err, replies) ->
+      rankForMember = replies[0]
+      if rankForMember?
+        rankForMember += 1
+      else
+        rankForMember = 0
+
+      callback(Math.ceil(rankForMember / pageSize))
+    )
 
   expireLeaderboard: (seconds, callback) ->
     this.expireLeaderboardFor(@leaderboardName, seconds, callback)

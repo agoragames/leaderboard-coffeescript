@@ -227,6 +227,32 @@ describe 'Leaderboard', ->
       reply.should.equal(92)
       done())
 
+  it 'should return the correct page when calling page_for for a given member', (done) ->
+    @leaderboard.pageFor('jones', Leaderboard.DEFAULT_PAGE_SIZE, (reply) ->
+      reply.should.equal(0))
+
+    for index in [1..20]
+      @leaderboard.rankMember("member_#{index}", index, null, (reply) -> )
+
+    @leaderboard.pageFor('member_17', Leaderboard.DEFAULT_PAGE_SIZE, (reply) ->
+      reply.should.equal(1))
+    @leaderboard.pageFor('member_11', Leaderboard.DEFAULT_PAGE_SIZE, (reply) ->
+      reply.should.equal(1))
+    @leaderboard.pageFor('member_10', Leaderboard.DEFAULT_PAGE_SIZE, (reply) ->
+      reply.should.equal(1))
+    @leaderboard.pageFor('member_1', Leaderboard.DEFAULT_PAGE_SIZE, (reply) ->
+      reply.should.equal(1))
+
+    @leaderboard.pageFor('member_17', 10, (reply) ->
+      reply.should.equal(1))
+    @leaderboard.pageFor('member_11', 10, (reply) ->
+      reply.should.equal(1))
+    @leaderboard.pageFor('member_10', 10, (reply) ->
+      reply.should.equal(2))
+    @leaderboard.pageFor('member_1', 10, (reply) ->
+      reply.should.equal(2)
+      done())
+
   it 'should set an expire on the leaderboard', (done) ->
     for index in [0...5]
       @leaderboard.rankMember("member_#{index}", index, null, (reply) -> )
