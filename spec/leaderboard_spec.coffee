@@ -359,3 +359,13 @@ describe 'Leaderboard', ->
       reply[0].member.should.equal('member_13')
       reply[12].member.should.equal('member_1')
       done())
+
+  it 'should be able to rank multiple members at once', (done) ->
+    @leaderboard.totalMembers((reply) ->
+      reply.should.equal(0))
+
+    @leaderboard.rankMembers(['member_1', 1, 'member_10', 10], (reply) -> )
+
+    @leaderboard.totalMembers((reply) ->
+      reply.should.equal(2)
+      done())

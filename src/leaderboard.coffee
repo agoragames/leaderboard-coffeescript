@@ -54,8 +54,16 @@ class Leaderboard
   # rankMemberIf
   # rankMemberIfIn
 
-  # rankMembers
-  # rankMembersIn
+  rankMembers: (membersAndScores, callback) ->
+    this.rankMembersIn(@leaderboardName, membersAndScores, callback)
+
+  rankMembersIn: (leaderboardName, membersAndScores, callback) ->
+    transaction = @redisConnection.multi()
+    for index in [0...membersAndScores.length] by 2
+      slice = membersAndScores[index...index + 2]
+      transaction.zadd(leaderboardName, slice[1], slice[0])
+    transaction.exec((err, reply) ->
+      callback(reply) if callback)
 
   memberDataFor: (member, callback) ->
     this.memberDataForIn(@leaderboardName, member, callback)
