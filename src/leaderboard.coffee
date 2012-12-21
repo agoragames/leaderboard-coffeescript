@@ -62,7 +62,7 @@ class Leaderboard
 
   memberDataForIn: (leaderboardName, member, callback = ->) ->
     @redisConnection.hget(this.memberDataKey(leaderboardName), member, (err, reply) ->
-      callback(reply) if callback)
+      callback(reply))
 
   updateMemberData: (member, member_data, callback) ->
     this.updateMemberDataFor(@leaderboardName, member, member_data, callback)
@@ -93,7 +93,7 @@ class Leaderboard
 
   totalMembersIn: (leaderboardName, callback) ->
     @redisConnection.zcard(leaderboardName, (err, reply) ->
-      callback(reply) if callback)
+      callback(reply))
 
   totalPages: (pageSize = null, callback) ->
     this.totalPagesIn(@leaderboardName, pageSize, callback)
@@ -110,7 +110,7 @@ class Leaderboard
 
   totalMembersInScoreRangeIn: (leaderboardName, minScore, maxScore, callback) ->
     @redisConnection.zcount(leaderboardName, minScore, maxScore, (err, reply) ->
-      callback(reply) if callback)
+      callback(reply))
 
   changeScoreFor: (member, delta, callback) ->
     this.changeScoreForMemberIn(@leaderboardName, member, delta, callback)
@@ -125,24 +125,24 @@ class Leaderboard
   rankForIn: (leaderboardName, member, callback) ->
     if @reverse
       @redisConnection.zrank(leaderboardName, member, (err, reply) ->
-        callback(reply + 1) if callback and reply)
+        callback(reply + 1) if reply)
     else
       @redisConnection.zrevrank(leaderboardName, member, (err, reply) ->
-        callback(reply + 1) if callback and reply)
+        callback(reply + 1) if reply)
 
   scoreFor: (member, callback) ->
     this.scoreForIn(@leaderboardName, member, callback)
 
   scoreForIn: (leaderboardName, member, callback) ->
     @redisConnection.zscore(leaderboardName, member, (err, reply) ->
-      callback(reply) if callback)
+      callback(reply))
 
   checkMember: (member, callback) ->
     this.checkMemberIn(@leaderboardName, member, callback)
 
   checkMemberIn: (leaderboardName, member, callback) ->
     @redisConnection.zscore(leaderboardName, member, (err, reply) ->
-      callback(reply?) if callback)
+      callback(reply?))
 
   scoreAndRankFor: (member, callback) ->
     this.scoreAndRankForIn(@leaderboardName, member, callback)
@@ -166,7 +166,7 @@ class Leaderboard
         else
           scoreAndRankData['rank'] = null
         scoreAndRankData['member'] = member
-        callback(scoreAndRankData) if callback)
+        callback(scoreAndRankData))
 
   removeMembersInScoreRange: (minScore, maxScore, callback) ->
     this.removeMembersInScoreRangeIn(@leaderboardName, minScore, maxScore)
