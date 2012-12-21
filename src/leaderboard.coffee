@@ -345,8 +345,11 @@ class Leaderboard
       @redisConnection.zrevrange(leaderboardName, startingRank, endingRank, (err, reply) =>
         this.rankedInListIn(leaderboardName, reply, options, callback))
 
-  # memberAt
-  # memberAtIn
+  memberAt: (position, options = {}, callback) ->
+    this.memberAtIn(@leaderboardName, position, options, callback)
+
+  memberAtIn: (leaderboardName, position, options = {}, callback) ->
+    this.membersFromRankRangeIn(leaderboardName, position, position, options, callback)
 
   # aroundMe
   # aroundMeIn

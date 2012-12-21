@@ -329,3 +329,16 @@ describe 'Leaderboard', ->
       reply[0].member.should.equal('member_21')
       reply[4].member.should.equal('member_17')
       done())
+
+  it 'should return a single member when calling memberAt', (done) ->
+    for index in [1..50]
+      @leaderboard.rankMember("member_#{index}", index, "Optional member data for member #{index}", (reply) -> )
+
+    @leaderboard.memberAt(1, null, (reply) ->
+      reply.length.should.equal(1)
+      reply[0].rank.should.equal(1)
+      reply[0].score.should.equal(50.0))
+
+    @leaderboard.memberAt(26, null, (reply) ->
+      reply[0].rank.should.equal(26)
+      done())
