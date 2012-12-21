@@ -272,6 +272,24 @@ class Leaderboard
           this.rankedInListIn(@leaderboardName, reply, options, callback))
     )
 
+    # allLeaders
+    # allLeadersFrom
+
+    # membersFromScoreRange
+    # membersFromScoreRangeIn
+
+    # membersFromRankRange
+    # membersFromRankRangeIn
+
+    # memberAt
+    # memberAtIn
+
+    # aroundMe
+    # aroundMeIn
+
+    # mergeLeaderboards
+    # intersectLeaderboards
+
   memberDataKey: (leaderboardName) ->
     "#{leaderboardName}:member_data"
 
