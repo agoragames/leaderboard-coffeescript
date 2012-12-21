@@ -392,6 +392,7 @@ describe 'Leaderboard', ->
   it 'should allow you to merge leaderboards', (done) ->
     foo = new Leaderboard('foo')
     bar = new Leaderboard('bar')
+    foobar = new Leaderboard('foobar')
 
     foo.rankMember('foo_1', 1, null, (reply) ->
       foo.rankMember('foo_2', 2, null, (reply) ->
@@ -400,11 +401,14 @@ describe 'Leaderboard', ->
             bar.rankMember('bar_3', 3, null, (reply) ->
               foo.mergeLeaderboards('foobar', ['bar'], null, (reply) -> 
                 reply.should.equal(5)
-                done()))))))
+                foobar.totalMembers((numMembers) ->
+                  numMembers.should.equal(5)
+                  done())))))))
 
   it 'should allow you to intersect leaderboards', (done) ->
     foo = new Leaderboard('foo')
     bar = new Leaderboard('bar')
+    foobar = new Leaderboard('foobar')
 
     foo.rankMember('foo_1', 1, null, (reply) ->
       foo.rankMember('foo_2', 2, null, (reply) ->
@@ -414,4 +418,6 @@ describe 'Leaderboard', ->
               bar.rankMember('bar_3', 5, null, (reply) ->
                 foo.intersectLeaderboards('foobar', ['bar'], null, (reply) -> 
                   reply.should.equal(2)
-                  done())))))))
+                  foobar.totalMembers((numMembers) ->
+                    numMembers.should.equal(2)
+                    done()))))))))
