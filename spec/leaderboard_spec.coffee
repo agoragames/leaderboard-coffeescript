@@ -11,7 +11,7 @@ describe 'Leaderboard', ->
   it 'should initialize the leaderboard correctly', (done) ->
     @leaderboard.leaderboardName.should.equal('highscores')
     @leaderboard.reverse.should.be.false
-    @leaderboard.pageSize.should.equal(Leaderboard.DEFAULT_pageSize)
+    @leaderboard.pageSize.should.equal(Leaderboard.DEFAULT_PAGE_SIZE)
 
     done()
 
@@ -23,7 +23,7 @@ describe 'Leaderboard', ->
     @leaderboard = new Leaderboard('highscores', updated_options)
     @leaderboard.leaderboardName.should.equal('highscores')
     @leaderboard.reverse.should.be.true
-    @leaderboard.pageSize.should.equal(Leaderboard.DEFAULT_pageSize)
+    @leaderboard.pageSize.should.equal(Leaderboard.DEFAULT_PAGE_SIZE)
 
     done()
 
@@ -114,7 +114,7 @@ describe 'Leaderboard', ->
       done())
 
   it 'should return the correct total pages', (done) ->
-    for index in [0...Leaderboard.DEFAULT_pageSize + 1]
+    for index in [0...Leaderboard.DEFAULT_PAGE_SIZE + 1]
       @leaderboard.rankMember("member_#{index}", index, null, (reply) -> )
 
     @leaderboard.totalPages(5, (reply) ->
@@ -123,7 +123,7 @@ describe 'Leaderboard', ->
     @leaderboard.totalPages(null, (reply) ->
       reply.should.equal(2))
 
-    @leaderboard.totalPages(Leaderboard.DEFAULT_pageSize, (reply) ->
+    @leaderboard.totalPages(Leaderboard.DEFAULT_PAGE_SIZE, (reply) ->
       reply.should.equal(2)
       done())
 

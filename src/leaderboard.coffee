@@ -1,10 +1,10 @@
 redis = require 'redis'
 
 class Leaderboard
-  @DEFAULT_pageSize = 25
+  @DEFAULT_PAGE_SIZE = 25
 
   DEFAULT_OPTIONS = 
-    'pageSize': @DEFAULT_pageSize
+    'pageSize': @DEFAULT_PAGE_SIZE
     'reverse': false
 
   @DEFAULT_REDIS_HOST = 'localhost'
@@ -19,7 +19,7 @@ class Leaderboard
     @reverse = options['reverse']
     @pageSize = options['pageSize']
     if @pageSize == null || @pageSize < 1
-      @pageSize = Leaderboard.DEFAULT_pageSize
+      @pageSize = Leaderboard.DEFAULT_PAGE_SIZE
 
     @redisConnection = redisOptions['redis_connection']
 
