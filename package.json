@@ -1,12 +1,12 @@
 {
   "name": "leaderboard",
   "version": "0.0.1",
-  "author": "David Czarnecki <me@davidczarnecki.com>",
+  "author": "David Czarnecki <dczarnecki@agoragames.com>",
   "description": "Leaderboards backed by Redis in CoffeeScript",
   "contributors": [ 
     {
       "name": "David Czarnecki",
-      "email": "me@davidczarnecki.com"
+      "email": "dczarnecki@agoragames.com"
     } 
   ],
   "main": "./lib/leaderboard",

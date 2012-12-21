@@ -41,18 +41,22 @@ class Leaderboard
     transaction.exec((err, reply) ->
       callback(reply) if callback)
 
-  rankMember: (member, score, member_data = null, callback) ->
-    this.rankMemberIn(@leaderboardName, member, score, member_data, callback)
+  rankMember: (member, score, memberData = null, callback) ->
+    this.rankMemberIn(@leaderboardName, member, score, memberData, callback)
 
-  rankMemberIn: (leaderboardName, member, score, member_data = null, callback) ->
+  rankMemberIn: (leaderboardName, member, score, memberData = null, callback) ->
     transaction = @redisConnection.multi()
     transaction.zadd(leaderboardName, score, member)
-    transaction.hset(this.memberDataKey(leaderboardName), member, member_data) if member_data?
+    transaction.hset(this.memberDataKey(leaderboardName), member, memberData) if memberData?
     transaction.exec((err, reply) ->
       callback(reply) if callback)
 
-  # rankMemberIf
-  # rankMemberIfIn
+  rankMemberIf: (rankConditional, member, score, memberData = null, callback) ->
+    this.rankMemberIfIn(@leaderboardName, rankConditional, member, score, memberData, callback)
+
+  rankMemberIfIn: (leaderboardName, rankConditional, member, score, currentScore, memberData = null, callback) ->
+    if rankConditional(member, currentScore, score, memberData, {'reverse': @reverse})
+      this.rankMemberIn(leaderboardName, member, score, memberData, callback)
 
   rankMembers: (membersAndScores, callback) ->
     this.rankMembersIn(@leaderboardName, membersAndScores, callback)
@@ -72,11 +76,11 @@ class Leaderboard
     @redisConnection.hget(this.memberDataKey(leaderboardName), member, (err, reply) ->
       callback(reply))
 
-  updateMemberData: (member, member_data, callback) ->
-    this.updateMemberDataFor(@leaderboardName, member, member_data, callback)
+  updateMemberData: (member, memberData, callback) ->
+    this.updateMemberDataFor(@leaderboardName, member, memberData, callback)
 
-  updateMemberDataFor: (leaderboardName, member, member_data, callback) ->
-    @redisConnection.hset(this.memberDataKey(leaderboardName), member, member_data, (err, reply) ->
+  updateMemberDataFor: (leaderboardName, member, memberData, callback) ->
+    @redisConnection.hset(this.memberDataKey(leaderboardName), member, memberData, (err, reply) ->
       callback(reply) if callback)
 
   removeMemberData: (member, callback) ->
@@ -143,7 +147,10 @@ class Leaderboard
 
   scoreForIn: (leaderboardName, member, callback) ->
     @redisConnection.zscore(leaderboardName, member, (err, reply) ->
-      callback(reply))
+      if reply?
+        callback(parseFloat(reply))
+      else
+        callback(null))
 
   checkMember: (member, callback) ->
     this.checkMemberIn(@leaderboardName, member, callback)

@@ -369,3 +369,22 @@ describe 'Leaderboard', ->
     @leaderboard.totalMembers((reply) ->
       reply.should.equal(2)
       done())
+
+  it 'should rank a member in the leaderboard with conditional execution', (done) ->
+    highscoreCheck = (member, currentScore, score, memberData, leaderboardOptions) ->
+      return true if !currentScore?
+      return true if score > currentScore
+      false
+
+    @leaderboard.totalMembers((reply) ->
+      reply.should.equal(0))
+    @leaderboard.rankMemberIf(highscoreCheck, 'david', 1337, null, 'Optional member data', (reply) -> )   
+    @leaderboard.scoreFor('david', (reply) ->
+      reply.should.equal(1337))
+    @leaderboard.rankMemberIf(highscoreCheck, 'david', 1336, 1337, 'Optional member data', (reply) -> )
+    @leaderboard.scoreFor('david', (reply) ->
+      reply.should.equal(1337))
+    @leaderboard.rankMemberIf(highscoreCheck, 'david', 1338, 1337, 'Optional member data', (reply) -> )
+    @leaderboard.scoreFor('david', (reply) ->
+      reply.should.equal(1338)
+      done())
