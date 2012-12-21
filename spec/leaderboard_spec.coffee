@@ -319,3 +319,13 @@ describe 'Leaderboard', ->
       reply[0].member.should.equal('member_15')
       reply[5].member.should.equal('member_10')
       done())
+
+  it 'should allow you to retrieve a given set of members in a given rank range', (done) ->
+    for index in [0..25]
+      @leaderboard.rankMember("member_#{index}", index, "Optional member data for member #{index}", (reply) -> )
+
+    @leaderboard.membersFromRankRange(5, 9, null, (reply) ->
+      reply.length.should.equal(5)
+      reply[0].member.should.equal('member_21')
+      reply[4].member.should.equal('member_17')
+      done())
