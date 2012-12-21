@@ -395,8 +395,25 @@ class Leaderboard
           []
       )
 
-  # mergeLeaderboards
-  # intersectLeaderboards
+  mergeLeaderboards: (destination, keys, options = {'aggregate': 'sum'}, callback) ->
+    len = keys.length + 1
+    keys.unshift(@leaderboardName)
+    keys.unshift(len)
+    keys.unshift(destination)
+    keys.push("AGGREGATE")
+    keys.push(options['aggregate'])
+    @redisConnection.zunionstore(keys, (err, reply) ->
+      callback(reply) if callback)
+
+  intersectLeaderboards: (destination, keys, options = {'aggregate': 'sum'}, callback) ->
+    len = keys.length + 1
+    keys.unshift(@leaderboardName)
+    keys.unshift(len)
+    keys.unshift(destination)
+    keys.push("AGGREGATE")
+    keys.push(options['aggregate'])
+    @redisConnection.zinterstore(keys, (err, reply) ->
+      callback(reply) if callback)
 
   memberDataKey: (leaderboardName) ->
     "#{leaderboardName}:member_data"
