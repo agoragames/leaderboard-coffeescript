@@ -309,3 +309,13 @@ describe 'Leaderboard', ->
     @leaderboard.allLeaders(null, (reply) ->
       reply.length.should.equal(26)
       done())
+
+  it 'should allow you to retrieve members from a given score range', (done) ->
+    for index in [0..25]
+      @leaderboard.rankMember("member_#{index}", index, "Optional member data for member #{index}", (reply) -> )
+
+    @leaderboard.membersFromScoreRange(10, 15, null, (reply) -> 
+      reply.length.should.equal(6)
+      reply[0].member.should.equal('member_15')
+      reply[5].member.should.equal('member_10')
+      done())

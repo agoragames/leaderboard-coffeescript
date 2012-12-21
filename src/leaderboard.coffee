@@ -315,20 +315,28 @@ class Leaderboard
       @redisConnection.zrevrange(leaderboardName, 0, -1, (err, reply) =>
         this.rankedInListIn(leaderboardName, reply, options, callback))
 
-    # membersFromScoreRange
-    # membersFromScoreRangeIn
+  membersFromScoreRange: (minimumScore, maximumScore, options = {}, callback) ->
+    this.membersFromScoreRangeIn(@leaderboardName, minimumScore, maximumScore, options, callback)
 
-    # membersFromRankRange
-    # membersFromRankRangeIn
+  membersFromScoreRangeIn: (leaderboardName, minimumScore, maximumScore, options = {}, callback) ->
+    if @reverse
+      @redisConnection.zrangebyscore(leaderboardName, minimumScore, maximumScore, (err, reply) =>
+        this.rankedInListIn(leaderboardName, reply, options, callback))
+    else
+      @redisConnection.zrevrangebyscore(leaderboardName, maximumScore, minimumScore, (err, reply) =>
+        this.rankedInListIn(leaderboardName, reply, options, callback))
 
-    # memberAt
-    # memberAtIn
+  # membersFromRankRange
+  # membersFromRankRangeIn
 
-    # aroundMe
-    # aroundMeIn
+  # memberAt
+  # memberAtIn
 
-    # mergeLeaderboards
-    # intersectLeaderboards
+  # aroundMe
+  # aroundMeIn
+
+  # mergeLeaderboards
+  # intersectLeaderboards
 
   memberDataKey: (leaderboardName) ->
     "#{leaderboardName}:member_data"
