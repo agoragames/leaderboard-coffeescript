@@ -61,6 +61,8 @@ class Leaderboard
 
   ###
   # Delete the current leaderboard.
+  #
+  # @param callback Optional callback for result of call.
   ###
   deleteLeaderboard: (callback) ->
     this.deleteLeaderboardNamed(@leaderboardName, callback)
@@ -69,6 +71,7 @@ class Leaderboard
   # Delete the named leaderboard.
   #
   # @param leaderboardName [String] Name of the leaderboard.
+  # @param callback Optional callback for result of call.
   ###
   deleteLeaderboardNamed: (leaderboardName, callback) ->
     transaction = @redisConnection.multi()
@@ -83,6 +86,7 @@ class Leaderboard
   # @param member [String] Member name.
   # @param score [float] Member score.
   # @param memberData [Hash] Optional member data.
+  # @param callback Optional callback for result of call.
   ###
   rankMember: (member, score, memberData = null, callback) ->
     this.rankMemberIn(@leaderboardName, member, score, memberData, callback)
@@ -90,10 +94,11 @@ class Leaderboard
   ###
   # Rank a member in the named leaderboard.
   #
-  # @param leaderboard_name [String] Name of the leaderboard.
+  # @param leaderboardName [String] Name of the leaderboard.
   # @param member [String] Member name.
   # @param score [float] Member score.
-  # @param member_data [Hash] Optional member data.
+  # @param memberData [Hash] Optional member data.
+  # @param callback Optional callback for result of call.
   ###
   rankMemberIn: (leaderboardName, member, score, memberData = null, callback) ->
     transaction = @redisConnection.multi()
@@ -103,46 +108,63 @@ class Leaderboard
       callback(reply) if callback)
 
   ###
-  # Rank a member in the leaderboard based on execution of the +rank_conditional+. 
+  # Rank a member in the leaderboard based on execution of the +rankConditional+. 
   #
-  # The +rank_conditional+ is passed the following parameters:
+  # The +rankConditional+ is passed the following parameters:
   #   member: Member name.
-  #   current_score: Current score for the member in the leaderboard.
+  #   currentScore: Current score for the member in the leaderboard.
   #   score: Member score.
-  #   member_data: Optional member data.
-  #   leaderboard_options: Leaderboard options, e.g. :reverse => Value of reverse option
+  #   memberData: Optional member data.
+  #   options: Leaderboard options, e.g. 'reverse': Value of reverse option
   #
-  # @param rank_conditional [lambda] Lambda which must return +true+ or +false+ that controls whether or not the member is ranked in the leaderboard.
+  # @param rankConditional [Function] Function which must return +true+ or +false+ that controls whether or not the member is ranked in the leaderboard.
   # @param member [String] Member name.
-  # @param score [String] Member score.
-  # @param member_data [Hash] Optional member_data.
+  # @param score [float] Member score.
+  # @param currentScore [float] Current score.
+  # @param memberData [Hash] Optional member_data.
+  # @param callback Optional callback for result of call.
   ###
-  rankMemberIf: (rankConditional, member, score, memberData = null, callback) ->
-    this.rankMemberIfIn(@leaderboardName, rankConditional, member, score, memberData, callback)
+  rankMemberIf: (rankConditional, member, score, currentScore, memberData = null, callback) ->
+    this.rankMemberIfIn(@leaderboardName, rankConditional, member, score, currentScore, memberData, callback)
 
   ###
-  # Rank a member in the named leaderboard based on execution of the +rank_conditional+. 
+  # Rank a member in the named leaderboard based on execution of the +rankConditional+. 
   #
-  # The +rank_conditional+ is passed the following parameters:
+  # The +rankConditional+ is passed the following parameters:
   #   member: Member name.
-  #   current_score: Current score for the member in the leaderboard.
+  #   currentScore: Current score for the member in the leaderboard.
   #   score: Member score.
-  #   member_data: Optional member data.
-  #   leaderboard_options: Leaderboard options, e.g. :reverse => Value of reverse option
+  #   memberData: Optional member data.
+  #   options: Leaderboard options, e.g. 'reverse': Value of reverse option
   #
-  # @param leaderboard_name [String] Name of the leaderboard.
-  # @param rank_conditional [lambda] Lambda which must return +true+ or +false+ that controls whether or not the member is ranked in the leaderboard.
+  # @param leaderboardName [String] Name of the leaderboard.
+  # @param rankConditional [Function] Function which must return +true+ or +false+ that controls whether or not the member is ranked in the leaderboard.
   # @param member [String] Member name.
-  # @param score [String] Member score.
-  # @param member_data [Hash] Optional member_data.
+  # @param score [float] Member score.
+  # @param currentScore [float] Current score.
+  # @param memberData [Hash] Optional memberData.
+  # @param callback Optional callback for result of call. 
   ###
   rankMemberIfIn: (leaderboardName, rankConditional, member, score, currentScore, memberData = null, callback) ->
     if rankConditional(member, currentScore, score, memberData, {'reverse': @reverse})
       this.rankMemberIn(leaderboardName, member, score, memberData, callback)
 
+  ###
+  # Rank an array of members in the leaderboard.
+  #
+  # @param membersAndScores [Array] Variable list of members and scores.
+  # @param callback Optional callback for result of call.
+  ###
   rankMembers: (membersAndScores, callback) ->
     this.rankMembersIn(@leaderboardName, membersAndScores, callback)
 
+  ###
+  # Rank an array of members in the named leaderboard.
+  #
+  # @param leaderboardName [String] Name of the leaderboard.
+  # @param membersAndScores [Array] Variable list of members and scores
+  # @param callback Optional callback for result of call.
+  ###
   rankMembersIn: (leaderboardName, membersAndScores, callback) ->
     transaction = @redisConnection.multi()
     for index in [0...membersAndScores.length] by 2
@@ -155,6 +177,7 @@ class Leaderboard
   # Retrieve the optional member data for a given member in the leaderboard.
   #
   # @param member [String] Member name.
+  # @param callback Callback for result of call.
   #
   # @return Hash of optional member data.
   ###
@@ -164,8 +187,9 @@ class Leaderboard
   ###
   # Retrieve the optional member data for a given member in the named leaderboard.
   #
-  # @param leaderboard_name [String] Name of the leaderboard.
+  # @param leaderboardName [String] Name of the leaderboard.
   # @param member [String] Member name.
+  # @param callback Callback for result of call.
   #
   # @return Hash of optional member data.
   ###
@@ -177,7 +201,8 @@ class Leaderboard
   # Update the optional member data for a given member in the leaderboard.
   #
   # @param member [String] Member name.
-  # @param member_data [Hash] Optional member data.
+  # @param memberData [Hash] Optional member data.
+  # @param callback Optional callback for result of call.
   ###
   updateMemberData: (member, memberData, callback) ->
     this.updateMemberDataFor(@leaderboardName, member, memberData, callback)
@@ -185,9 +210,10 @@ class Leaderboard
   ###
   # Update the optional member data for a given member in the named leaderboard.
   #
-  # @param leaderboard_name [String] Name of the leaderboard.
+  # @param leaderboardName [String] Name of the leaderboard.
   # @param member [String] Member name.
-  # @param member_data [Hash] Optional member data.
+  # @param memberData [Hash] Optional member data.
+  # @param callback Optional callback for result of call.
   ###
   updateMemberDataFor: (leaderboardName, member, memberData, callback) ->
     @redisConnection.hset(this.memberDataKey(leaderboardName), member, memberData, (err, reply) ->
@@ -197,6 +223,7 @@ class Leaderboard
   # Remove the optional member data for a given member in the leaderboard.
   #
   # @param member [String] Member name.
+  # @param callback Optional callback for result of call.
   ###
   removeMemberData: (member, callback) ->
     this.remberMemberDataFor(@leaderboardName, member, callback)
@@ -204,8 +231,9 @@ class Leaderboard
   ###
   # Remove the optional member data for a given member in the named leaderboard.
   #
-  # @param leaderboard_name [String] Name of the leaderboard.
+  # @param leaderboardName [String] Name of the leaderboard.
   # @param member [String] Member name.
+  # @param callback Optional callback for result of call.
   ###
   remberMemberDataFor: (leaderboardName, member, callback) ->
     @redisConnection.hdel(this.memberDataKey(leaderboardName), member, (err, reply) ->
@@ -215,6 +243,7 @@ class Leaderboard
   # Remove a member from the leaderboard.
   #
   # @param member [String] Member name.
+  # @param callback Optional callback for result of call.
   ###
   removeMember: (member, callback) ->
     this.removeMemberFrom(@leaderboardName, member, callback)
@@ -222,8 +251,9 @@ class Leaderboard
   ###
   # Remove a member from the named leaderboard.
   #
-  # @param leaderboard_name [String] Name of the leaderboard.
+  # @param leaderboardName [String] Name of the leaderboard.
   # @param member [String] Member name.
+  # @param callback Optional callback for result of call.
   ###
   removeMemberFrom: (leaderboardName, member, callback) ->
     transaction = @redisConnection.multi()
@@ -236,6 +266,7 @@ class Leaderboard
   # Retrieve the total number of members in the leaderboard.
   #
   # @return total number of members in the leaderboard.
+  # @param callback Callback for result of call.
   ###
   totalMembers: (callback) ->
     this.totalMembersIn(@leaderboardName, callback)
@@ -243,7 +274,8 @@ class Leaderboard
   ###
   # Retrieve the total number of members in the named leaderboard.
   #
-  # @param leaderboard_name [String] Name of the leaderboard.
+  # @param leaderboardName [String] Name of the leaderboard.
+  # @param callback Callback for result of call.
   #
   # @return the total number of members in the named leaderboard.
   ###
@@ -254,7 +286,8 @@ class Leaderboard
   ###
   # Retrieve the total number of pages in the leaderboard.
   #
-  # @param page_size [int, nil] Page size to be used when calculating the total number of pages.
+  # @param pageSize [int, nil] Page size to be used when calculating the total number of pages.
+  # @param callback Callback for result of call.
   #
   # @return the total number of pages in the leaderboard.
   ###
@@ -264,8 +297,9 @@ class Leaderboard
   ###
   # Retrieve the total number of pages in the named leaderboard.
   #
-  # @param leaderboard_name [String] Name of the leaderboard.
-  # @param page_size [int, nil] Page size to be used when calculating the total number of pages.
+  # @param leaderboardName [String] Name of the leaderboard.
+  # @param pageSize [int, nil] Page size to be used when calculating the total number of pages.
+  # @param callback Callback for result of call.
   #
   # @return the total number of pages in the named leaderboard.
   ###
@@ -279,8 +313,9 @@ class Leaderboard
   ###
   # Retrieve the total members in a given score range from the leaderboard.
   #
-  # @param min_score [float] Minimum score.
-  # @param max_score [float] Maximum score.
+  # @param minScore [float] Minimum score.
+  # @param maxScore [float] Maximum score.
+  # @param callback Callback for result of call.
   #
   # @return the total members in a given score range from the leaderboard.
   ###
@@ -291,8 +326,9 @@ class Leaderboard
   # Retrieve the total members in a given score range from the named leaderboard.
   #
   # @param leaderboard_name Name of the leaderboard.
-  # @param min_score [float] Minimum score.
-  # @param max_score [float] Maximum score.
+  # @param minScore [float] Minimum score.
+  # @param maxScore [float] Maximum score.
+  # @param callback Callback for result of call.
   #
   # @return the total members in a given score range from the named leaderboard.
   ###
@@ -305,6 +341,7 @@ class Leaderboard
   #
   # @param member [String] Member name.
   # @param delta [float] Score change.
+  # @param callback Optional callback for result of call.
   ###
   changeScoreFor: (member, delta, callback) ->
     this.changeScoreForMemberIn(@leaderboardName, member, delta, callback)
@@ -312,9 +349,10 @@ class Leaderboard
   ###
   # Change the score for a member in the named leaderboard by a delta which can be positive or negative.
   #
-  # @param leaderboard_name [String] Name of the leaderboard.
+  # @param leaderboardName [String] Name of the leaderboard.
   # @param member [String] Member name.
   # @param delta [float] Score change.
+  # @param callback Optional callback for result of call.
   ###
   changeScoreForMemberIn: (leaderboardName, member, delta, callback) ->
     @redisConnection.zincrby(leaderboardName, delta, member, (err, reply) ->
@@ -324,6 +362,7 @@ class Leaderboard
   # Retrieve the rank for a member in the leaderboard.
   #
   # @param member [String] Member name.
+  # @param callback Callback for result of call.
   # 
   # @return the rank for a member in the leaderboard.
   ###
@@ -333,8 +372,9 @@ class Leaderboard
   ###
   # Retrieve the rank for a member in the named leaderboard.
   #
-  # @param leaderboard_name [String] Name of the leaderboard.
+  # @param leaderboardName [String] Name of the leaderboard.
   # @param member [String] Member name.
+  # @param callback Callback for result of call.
   # 
   # @return the rank for a member in the leaderboard.
   ###
@@ -350,6 +390,7 @@ class Leaderboard
   # Retrieve the score for a member in the leaderboard.
   #
   # @param member Member name.
+  # @param callback Callback for result of call.
   #
   # @return the score for a member in the leaderboard or +nil+ if the member is not in the leaderboard.
   ###
@@ -359,8 +400,9 @@ class Leaderboard
   ###
   # Retrieve the score for a member in the named leaderboard.
   #
-  # @param leaderboard_name Name of the leaderboard.
+  # @param leaderboardName Name of the leaderboard.
   # @param member [String] Member name.
+  # @param callback Callback for result of call.  
   #
   # @return the score for a member in the leaderboard or +nil+ if the member is not in the leaderboard.
   ###
@@ -375,6 +417,7 @@ class Leaderboard
   # Check to see if a member exists in the leaderboard.
   #
   # @param member [String] Member name.
+  # @param callback Callback for result of call.
   #
   # @return +true+ if the member exists in the leaderboard, +false+ otherwise.
   ###
@@ -384,8 +427,9 @@ class Leaderboard
   ###
   # Check to see if a member exists in the named leaderboard.
   #
-  # @param leaderboard_name [String] Name of the leaderboard.
+  # @param leaderboardName [String] Name of the leaderboard.
   # @param member [String] Member name.
+  # @param callback Callback for result of call.
   #
   # @return +true+ if the member exists in the named leaderboard, +false+ otherwise.
   ###
@@ -397,6 +441,7 @@ class Leaderboard
   # Retrieve the score and rank for a member in the leaderboard.
   #
   # @param member [String] Member name.
+  # @param callback Callback for result of call.
   #
   # @return the score and rank for a member in the leaderboard as a Hash.
   ###
@@ -406,8 +451,9 @@ class Leaderboard
   ###
   # Retrieve the score and rank for a member in the named leaderboard.
   #
-  # @param leaderboard_name [String]Name of the leaderboard.
+  # @param leaderboardName [String]Name of the leaderboard.
   # @param member [String] Member name.
+  # @param callback Callback for result of call.  
   #
   # @return the score and rank for a member in the named leaderboard as a Hash.
   ###
@@ -435,8 +481,9 @@ class Leaderboard
   ###
   # Remove members from the leaderboard in a given score range.
   #
-  # @param min_score [float] Minimum score.
-  # @param max_score [float] Maximum score.
+  # @param minScore [float] Minimum score.
+  # @param maxScore [float] Maximum score.
+  # @param callback Optional callback for result of call.  
   ###
   removeMembersInScoreRange: (minScore, maxScore, callback) ->
     this.removeMembersInScoreRangeIn(@leaderboardName, minScore, maxScore)
@@ -444,9 +491,10 @@ class Leaderboard
   ###
   # Remove members from the named leaderboard in a given score range.
   #
-  # @param leaderboard_name [String] Name of the leaderboard.
-  # @param min_score [float] Minimum score.
-  # @param max_score [float] Maximum score.
+  # @param leaderboardName [String] Name of the leaderboard.
+  # @param minScore [float] Minimum score.
+  # @param maxScore [float] Maximum score.
+  # @param callback Optional callback for result of call.
   ###
   removeMembersInScoreRangeIn: (leaderboardName, minScore, maxScore, callback) ->
     @redisConnection.zremrangebyscore(leaderboardName, minScore, maxScore, (err, reply) ->
@@ -456,6 +504,7 @@ class Leaderboard
   # Retrieve the percentile for a member in the leaderboard.
   #
   # @param member [String] Member name.
+  # @param callback Callback for result of call.
   #
   # @return the percentile for a member in the leaderboard. Return +nil+ for a non-existent member.
   ###
@@ -465,8 +514,9 @@ class Leaderboard
   ###
   # Retrieve the percentile for a member in the named leaderboard.
   #
-  # @param leaderboard_name [String] Name of the leaderboard.
+  # @param leaderboardName [String] Name of the leaderboard.
   # @param member [String] Member name.
+  # @param callback Callback for result of call.
   #
   # @return the percentile for a member in the named leaderboard.
   ###
@@ -490,10 +540,10 @@ class Leaderboard
   # Determine the page where a member falls in the leaderboard.
   #
   # @param member [String] Member name.
-  # @param page_size [int] Page size to be used in determining page location.
+  # @param pageSize [int] Page size to be used in determining page location.
+  # @param callback Callback for result of call.
   #
   # @return the page where a member falls in the leaderboard.
-  def page_for(member, page_size = DEFAULT_PAGE_SIZE)
   ###
   pageFor: (member, pageSize = @DEFAULT_PAGE_SIZE, callback) ->
     this.pageForIn(@leaderboardName, member, pageSize, callback)
@@ -501,9 +551,10 @@ class Leaderboard
   ###
   # Determine the page where a member falls in the named leaderboard.
   #
-  # @param leaderboard [String] Name of the leaderboard.
+  # @param leaderboardName [String] Name of the leaderboard.
   # @param member [String] Member name.
-  # @param page_size [int] Page size to be used in determining page location.
+  # @param pageSize [int] Page size to be used in determining page location.
+  # @param callback Callback for result of call.
   #
   # @return the page where a member falls in the leaderboard.
   ###
@@ -529,6 +580,7 @@ class Leaderboard
   # expiration out to the keys for the member data.
   #
   # @param seconds [int] Number of seconds after which the leaderboard will be expired.
+  # @param callback Optional callback for result of call.
   ###
   expireLeaderboard: (seconds, callback) ->
     this.expireLeaderboardFor(@leaderboardName, seconds, callback)
@@ -538,8 +590,9 @@ class Leaderboard
   # leaderboards that utilize member data as there is no facility to cascade the
   # expiration out to the keys for the member data.
   #
-  # @param leaderboard_name [String] Name of the leaderboard.
+  # @param leaderboardName [String] Name of the leaderboard.
   # @param seconds [int] Number of seconds after which the leaderboard will be expired.
+  # @param callback Optional callback for result of call.
   ###
   expireLeaderboardFor: (leaderboardName, seconds, callback) ->
     @redisConnection.expire(leaderboardName, seconds, (err, reply) ->
@@ -551,6 +604,7 @@ class Leaderboard
   # expiration out to the keys for the member data.
   #
   # @param timestamp [int] UNIX timestamp at which the leaderboard will be expired.
+  # @param callback Optional callback for result of call.
   ###
   expireLeaderboardAt: (timestamp, callback) ->
     this.expireLeaderboardAtFor(@leaderboardName, timestamp, callback)
@@ -560,8 +614,9 @@ class Leaderboard
   # leaderboards that utilize member data as there is no facility to cascade the
   # expiration out to the keys for the member data.
   #
-  # @param leaderboard_name [String] Name of the leaderboard.
+  # @param leaderboardName [String] Name of the leaderboard.
   # @param timestamp [int] UNIX timestamp at which the leaderboard will be expired.
+  # @param callback Optional callback for result of call.
   ###
   expireLeaderboardAtFor: (leaderboardName, timestamp, callback) ->
     @redisConnection.expireat(leaderboardName, timestamp, (err, reply) ->
@@ -572,6 +627,7 @@ class Leaderboard
   #
   # @param members [Array] Member names.
   # @param options [Hash] Options to be used when retrieving the page from the leaderboard.
+  # @param callback Callback for result of call.
   #
   # @return a page of leaders from the leaderboard for a given list of members.
   ###
@@ -581,9 +637,10 @@ class Leaderboard
   ###
   # Retrieve a page of leaders from the named leaderboard for a given list of members.
   #
-  # @param leaderboard_name [String] Name of the leaderboard.
+  # @param leaderboardName [String] Name of the leaderboard.
   # @param members [Array] Member names.
   # @param options [Hash] Options to be used when retrieving the page from the named leaderboard.
+  # @param callback Callback for result of call.
   #
   # @return a page of leaders from the named leaderboard for a given list of members.
   ###
@@ -641,8 +698,9 @@ class Leaderboard
   ###
   # Retrieve a page of leaders from the leaderboard.
   #
-  # @param current_page [int] Page to retrieve from the leaderboard.
+  # @param currentPage [int] Page to retrieve from the leaderboard.
   # @param options [Hash] Options to be used when retrieving the page from the leaderboard.
+  # @param callback Callback for result of call.
   #
   # @return a page of leaders from the leaderboard.
   ###
@@ -652,9 +710,10 @@ class Leaderboard
   ###
   # Retrieve a page of leaders from the named leaderboard.
   #
-  # @param leaderboard_name [String] Name of the leaderboard.
-  # @param current_page [int] Page to retrieve from the named leaderboard.
+  # @param leaderboardName [String] Name of the leaderboard.
+  # @param currentPage [int] Page to retrieve from the named leaderboard.
   # @param options [Hash] Options to be used when retrieving the page from the named leaderboard.
+  # @param callback Callback for result of call.
   #
   # @return a page of leaders from the named leaderboard.
   ###
@@ -682,6 +741,7 @@ class Leaderboard
   # Retrieve all leaders from the leaderboard.
   #
   # @param options [Hash] Options to be used when retrieving the leaders from the leaderboard.
+  # @param callback Callback for result of call.
   #
   # @return the leaders from the leaderboard.
   ###
@@ -691,8 +751,9 @@ class Leaderboard
   ###
   # Retrieves all leaders from the named leaderboard.
   #
-  # @param leaderboard_name [String] Name of the leaderboard.
+  # @param leaderboardName [String] Name of the leaderboard.
   # @param options [Hash] Options to be used when retrieving the leaders from the named leaderboard.
+  # @param callback Callback for result of call.
   #
   # @return the named leaderboard.
   ###
@@ -707,9 +768,10 @@ class Leaderboard
   ###
   # Retrieve members from the leaderboard within a given score range.
   #
-  # @param minimum_score [float] Minimum score (inclusive).
-  # @param maximum_score [float] Maximum score (inclusive).
+  # @param minimumScore [float] Minimum score (inclusive).
+  # @param maximumScore [float] Maximum score (inclusive).
   # @param options [Hash] Options to be used when retrieving the data from the leaderboard.
+  # @param callback Callback for result of call.
   #
   # @return members from the leaderboard that fall within the given score range.
   ###
@@ -719,10 +781,11 @@ class Leaderboard
   ###
   # Retrieve members from the named leaderboard within a given score range.
   #
-  # @param leaderboard_name [String] Name of the leaderboard.
-  # @param minimum_score [float] Minimum score (inclusive).
-  # @param maximum_score [float] Maximum score (inclusive).
+  # @param leaderboardName [String] Name of the leaderboard.
+  # @param minimumScore [float] Minimum score (inclusive).
+  # @param maximumScore [float] Maximum score (inclusive).
   # @param options [Hash] Options to be used when retrieving the data from the leaderboard.
+  # @param callback Callback for result of call.
   #
   # @return members from the leaderboard that fall within the given score range.
   ###
@@ -737,9 +800,10 @@ class Leaderboard
   ###
   # Retrieve members from the leaderboard within a given rank range.
   #
-  # @param starting_rank [int] Starting rank (inclusive).
-  # @param ending_rank [int] Ending rank (inclusive).
+  # @param startingRank [int] Starting rank (inclusive).
+  # @param endingRank [int] Ending rank (inclusive).
   # @param options [Hash] Options to be used when retrieving the data from the leaderboard.
+  # @param callback Callback for result of call.
   #
   # @return members from the leaderboard that fall within the given rank range.
   ###
@@ -749,10 +813,11 @@ class Leaderboard
   ###
   # Retrieve members from the named leaderboard within a given rank range.
   #
-  # @param leaderboard_name [String] Name of the leaderboard.
-  # @param starting_rank [int] Starting rank (inclusive).
-  # @param ending_rank [int] Ending rank (inclusive).
+  # @param leaderboardName [String] Name of the leaderboard.
+  # @param startingRank [int] Starting rank (inclusive).
+  # @param endingRank [int] Ending rank (inclusive).
   # @param options [Hash] Options to be used when retrieving the data from the leaderboard.
+  # @param callback Callback for result of call.
   #
   # @return members from the leaderboard that fall within the given rank range.
   ###
@@ -777,6 +842,7 @@ class Leaderboard
   #
   # @param position [int] Position in leaderboard.
   # @param options [Hash] Options to be used when retrieving the member from the leaderboard.
+  # @param callback Callback for result of call.
   #
   # @return a member from the leaderboard.
   ###
@@ -786,9 +852,10 @@ class Leaderboard
   ###
   # Retrieve a member at the specified index from the leaderboard.
   #
-  # @param leaderboard_name [String] Name of the leaderboard.
+  # @param leaderboardName [String] Name of the leaderboard.
   # @param position [int] Position in named leaderboard.
   # @param options [Hash] Options to be used when retrieving the member from the named leaderboard.
+  # @param callback Callback for result of call.
   #
   # @return a page of leaders from the named leaderboard.
   ###
@@ -800,6 +867,7 @@ class Leaderboard
   #
   # @param member [String] Member name.
   # @param options [Hash] Options to be used when retrieving the page from the leaderboard.
+  # @param callback Callback for result of call.
   #
   # @return a page of leaders from the leaderboard around a given member.
   ###
@@ -809,9 +877,10 @@ class Leaderboard
   ###
   # Retrieve a page of leaders from the named leaderboard around a given member.
   #
-  # @param leaderboard_name [String] Name of the leaderboard.
+  # @param leaderboardName [String] Name of the leaderboard.
   # @param member [String] Member name.
   # @param options [Hash] Options to be used when retrieving the page from the named leaderboard.
+  # @param callback Callback for result of call.
   #
   # @return a page of leaders from the named leaderboard around a given member. Returns an empty array for a non-existent member.
   ###
@@ -847,6 +916,7 @@ class Leaderboard
   # @param destination [String] Destination leaderboard name.
   # @param keys [Array] Leaderboards to be merged with the current leaderboard.
   # @param options [Hash] Options for merging the leaderboards.
+  # @param callback Callback for result of call.
   ###
   mergeLeaderboards: (destination, keys, options = {'aggregate': 'sum'}, callback) ->
     len = keys.length + 1
@@ -864,6 +934,7 @@ class Leaderboard
   # @param destination [String] Destination leaderboard name.
   # @param keys [Array] Leaderboards to be merged with the current leaderboard.
   # @param options [Hash] Options for intersecting the leaderboards.
+  # @param callback Callback for result of call.
   ###
   intersectLeaderboards: (destination, keys, options = {'aggregate': 'sum'}, callback) ->
     len = keys.length + 1
@@ -878,9 +949,9 @@ class Leaderboard
   ###
   # Key for retrieving optional member data.
   #
-  # @param leaderboard_name [String] Name of the leaderboard.
+  # @param leaderboardName [String] Name of the leaderboard.
   # 
-  # @return a key in the form of +leaderboard_name:member_data+
+  # @return a key in the form of +leaderboardName:member_data+
   ###
   memberDataKey: (leaderboardName) ->
     "#{leaderboardName}:member_data"
