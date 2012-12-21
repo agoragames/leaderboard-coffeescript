@@ -214,20 +214,41 @@ class Leaderboard
           data = {}
           data['member'] = member
           data['rank'] = replies[index * 2] + 1
-          data['score'] = replies[index * 2 + 1]        
+          if replies[index * 2 + 1]
+            data['score'] = parseFloat(replies[index * 2 + 1])
+          else
+            data['score'] = null
+            data['rank'] = null
 
           # Retrieve optional member data based on options['with_member_data']
           if options['with_member_data']
-            # Pull in the bits
-            true
-
-          ranksForMembers.push(data)
-
-      # Sort results based on options['sort_by']
-
-      callback(ranksForMembers) if callback
+            this.memberDataForIn @leaderboardName, member, (memberdata) =>
+              data['member_data'] = memberdata
+              ranksForMembers.push(data)
+              # Sort if options['sort_by']
+              if ranksForMembers.length == members.length
+                switch options['sort_by']
+                  when 'rank'
+                    ranksForMembers.sort((a, b) ->
+                      a.rank > b.rank)
+                  when 'score'
+                    ranksForMembers.sort((a, b) ->
+                      a.score > b.score)
+                callback(ranksForMembers)
+          else
+            ranksForMembers.push(data)
+            # Sort if options['sort_by']
+            if ranksForMembers.length == members.length
+              switch options['sort_by']
+                when 'rank'
+                  ranksForMembers.sort((a, b) ->
+                    a.rank > b.rank)
+                when 'score'
+                  ranksForMembers.sort((a, b) ->
+                    a.score > b.score)
+              callback(ranksForMembers)
     )
-    
+
   leaders: (currentPage, options = {}, callback) ->
     this.leadersIn(@leaderboardName, currentPage, options, callback)
 
@@ -244,13 +265,11 @@ class Leaderboard
       endingOffset = (startingOffset + pageSize) - 1
 
       if @reverse
-        @redisConnection.zrange(leaderboardName, startingOffset, endingOffset, (err, reply) =>          
-          this.rankedInListIn(@leaderboardName, reply, options, callback)
-        )
+        @redisConnection.zrange(leaderboardName, startingOffset, endingOffset, (err, reply) =>
+          this.rankedInListIn(@leaderboardName, reply, options, callback))
       else
         @redisConnection.zrevrange(leaderboardName, startingOffset, endingOffset, (err, reply) =>
-          this.rankedInListIn(@leaderboardName, reply, options, callback)
-        )
+          this.rankedInListIn(@leaderboardName, reply, options, callback))
     )
 
   memberDataKey: (leaderboardName) ->

@@ -240,8 +240,22 @@ describe 'Leaderboard', ->
       reply.should.equal(26))
 
     @leaderboard.leaders(1, {'with_member_data': true}, (reply) ->
+      reply[0].score.should.equal(25)
+      reply[0].rank.should.equal(1)
+      reply[0].member.should.equal('member_25')
+      reply[0]['member_data'].should.equal('Optional member data for member 25')
       reply.length.should.equal(25))
 
     @leaderboard.leaders(2, {'with_member_data': true}, (reply) ->
       reply.length.should.equal(1)
+      done())
+
+  it 'should return the correct list when calling ranked in list', (done) ->
+    for index in [0..25]
+      @leaderboard.rankMember("member_#{index}", index, "Optional member data for member #{index}", (reply) -> )
+
+    @leaderboard.rankedInList(['member_5', 'member_17', 'member_1'], null, (reply) ->
+      reply[0].member.should.equal('member_5')
+      reply[0].score.should.equal(5)
+      reply[0].rank.should.equal(21)
       done())
