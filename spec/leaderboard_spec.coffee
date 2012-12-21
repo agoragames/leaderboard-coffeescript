@@ -393,25 +393,25 @@ describe 'Leaderboard', ->
     foo = new Leaderboard('foo')
     bar = new Leaderboard('bar')
 
-    foo.rankMember('foo_1', 1, null, (reply) ->)
-    foo.rankMember('foo_2', 2, null, (reply) ->)
-    bar.rankMember('bar_1', 1, null, (reply) ->)
-    bar.rankMember('bar_2', 2, null, (reply) ->)
-    bar.rankMember('bar_3', 3, null, (reply) ->)
-
-    foo.mergeLeaderboards('foobar', ['bar'], null, (reply) -> 
-      done())
+    foo.rankMember('foo_1', 1, null, (reply) ->
+      foo.rankMember('foo_2', 2, null, (reply) ->
+        bar.rankMember('bar_1', 1, null, (reply) ->
+          bar.rankMember('bar_2', 2, null, (reply) ->
+            bar.rankMember('bar_3', 3, null, (reply) ->
+              foo.mergeLeaderboards('foobar', ['bar'], null, (reply) -> 
+                reply.should.equal(5)
+                done()))))))
 
   it 'should allow you to intersect leaderboards', (done) ->
     foo = new Leaderboard('foo')
     bar = new Leaderboard('bar')
 
-    foo.rankMember('foo_1', 1, null, (reply) ->)
-    foo.rankMember('foo_2', 2, null, (reply) ->)
-    foo.rankMember('bar_3', 6, null, (reply) ->)
-    bar.rankMember('bar_1', 3, null, (reply) ->)
-    bar.rankMember('foo_1', 4, null, (reply) ->)
-    bar.rankMember('bar_3', 5, null, (reply) ->)
-
-    foo.intersectLeaderboards('foobar', ['bar'], null, (reply) -> 
-      done())
+    foo.rankMember('foo_1', 1, null, (reply) ->
+      foo.rankMember('foo_2', 2, null, (reply) ->
+        foo.rankMember('bar_3', 6, null, (reply) ->
+          bar.rankMember('bar_1', 3, null, (reply) ->
+            bar.rankMember('foo_1', 4, null, (reply) ->
+              bar.rankMember('bar_3', 5, null, (reply) ->
+                foo.intersectLeaderboards('foobar', ['bar'], null, (reply) -> 
+                  reply.should.equal(2)
+                  done())))))))
