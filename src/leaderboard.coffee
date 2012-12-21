@@ -175,9 +175,24 @@ class Leaderboard
     @redisConnection.zremrangebyscore(leaderboardName, minScore, maxScore, (err, reply) ->
       callback(reply) if callback)
 
-  # percentileFor
-  # percentileForIn
+  percentileFor: (member, callback) ->
+    this.percentileForIn(@leaderboardName, member, callback)
 
+  percentileForIn: (leaderboardName, member, callback) ->
+    this.checkMemberIn(leaderboardName, member, (reply) =>
+      if reply
+        transaction = @redisConnection.multi()
+        transaction.zcard(leaderboardName)
+        transaction.zrevrank(leaderboardName, member)
+        transaction.exec((err, replies) ->
+          if replies
+            percentile = Math.ceil(parseFloat((parseFloat(replies[0] - replies[1] - 1)) / parseFloat(replies[0]) * 100))
+            if @reverse
+              callback(100 - percentile)
+            else
+              callback(percentile)
+        )
+    )
   # pageFor
   # pageForIn
 

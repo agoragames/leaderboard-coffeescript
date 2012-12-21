@@ -211,6 +211,22 @@ describe 'Leaderboard', ->
       reply.should.equal(5)
       done())
 
+  it 'should return the correct information when calling percentile_for', (done) ->
+    for index in [1...13]
+      @leaderboard.rankMember("member_#{index}", index, null, (reply) -> )
+
+    @leaderboard.percentileFor('member_1', (reply) ->
+      reply.should.equal(0))
+    @leaderboard.percentileFor('member_2', (reply) ->
+      reply.should.equal(9))
+    @leaderboard.percentileFor('member_3', (reply) ->
+      reply.should.equal(17))
+    @leaderboard.percentileFor('member_4', (reply) ->
+      reply.should.equal(25))
+    @leaderboard.percentileFor('member_12', (reply) ->
+      reply.should.equal(92)
+      done())
+
   it 'should set an expire on the leaderboard', (done) ->
     for index in [0...5]
       @leaderboard.rankMember("member_#{index}", index, null, (reply) -> )
