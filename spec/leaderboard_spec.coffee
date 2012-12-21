@@ -342,3 +342,20 @@ describe 'Leaderboard', ->
     @leaderboard.memberAt(26, null, (reply) ->
       reply[0].rank.should.equal(26)
       done())
+
+  it 'should return the correct list of members around me', (done) ->
+    for index in [1..(Leaderboard.DEFAULT_PAGE_SIZE * 3 + 1)]
+      @leaderboard.rankMember("member_#{index}", index, "Optional member data for member #{index}", (reply) -> )
+
+    @leaderboard.totalMembers((reply) ->
+      reply.should.equal(Leaderboard.DEFAULT_PAGE_SIZE * 3 + 1))
+
+    @leaderboard.aroundMe('member_30', null, (reply) ->
+      reply[0].member.should.equal('member_42')
+      reply.length.should.equal(Leaderboard.DEFAULT_PAGE_SIZE)
+      reply[24].member.should.equal('member_18'))
+
+    @leaderboard.aroundMe('member_1', null, (reply) ->
+      reply[0].member.should.equal('member_13')
+      reply[12].member.should.equal('member_1')
+      done())

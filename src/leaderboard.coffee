@@ -351,8 +351,34 @@ class Leaderboard
   memberAtIn: (leaderboardName, position, options = {}, callback) ->
     this.membersFromRankRangeIn(leaderboardName, position, position, options, callback)
 
-  # aroundMe
-  # aroundMeIn
+  aroundMe: (member, options = {}, callback) ->
+    this.aroundMeIn(@leaderboardName, member, options, callback)
+
+  aroundMeIn: (leaderboardName, member, options = {}, callback) ->
+    if @reverse
+      @redisConnection.zrank(leaderboardName, member, (err, reply) => 
+        if reply?
+          startingOffset = parseInt(Math.ceil(reply - (@pageSize / 2)))
+          startingOffset = 0 if startingOffset < 0
+          endingOffset = (startingOffset + @pageSize) - 1
+
+          @redisConnection.zrange(leaderboardName, startingOffset, endingOffset, (err, reply) =>
+            this.rankedInListIn(leaderboardName, reply, options, callback))
+        else
+          []
+      )
+    else
+      @redisConnection.zrevrank(leaderboardName, member, (err, reply) =>
+        if reply?
+          startingOffset = parseInt(Math.ceil(reply - (@pageSize / 2)))
+          startingOffset = 0 if startingOffset < 0
+          endingOffset = (startingOffset + @pageSize) - 1
+
+          @redisConnection.zrevrange(leaderboardName, startingOffset, endingOffset, (err, reply) =>
+            this.rankedInListIn(leaderboardName, reply, options, callback))
+        else
+          []
+      )
 
   # mergeLeaderboards
   # intersectLeaderboards
