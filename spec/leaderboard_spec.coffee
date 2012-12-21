@@ -301,3 +301,11 @@ describe 'Leaderboard', ->
       reply[0].score.should.equal(5)
       reply[0].rank.should.equal(21)
       done())
+
+  it 'should return the entire leaderboard when calling allLeaders', (done) ->
+    for index in [0..25]
+      @leaderboard.rankMember("member_#{index}", index, "Optional member data for member #{index}", (reply) -> )
+
+    @leaderboard.allLeaders(null, (reply) ->
+      reply.length.should.equal(26)
+      done())

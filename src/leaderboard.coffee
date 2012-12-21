@@ -298,14 +298,22 @@ class Leaderboard
 
       if @reverse
         @redisConnection.zrange(leaderboardName, startingOffset, endingOffset, (err, reply) =>
-          this.rankedInListIn(@leaderboardName, reply, options, callback))
+          this.rankedInListIn(leaderboardName, reply, options, callback))
       else
         @redisConnection.zrevrange(leaderboardName, startingOffset, endingOffset, (err, reply) =>
-          this.rankedInListIn(@leaderboardName, reply, options, callback))
+          this.rankedInListIn(leaderboardName, reply, options, callback))
     )
 
-    # allLeaders
-    # allLeadersFrom
+  allLeaders: (options = {}, callback) ->
+    this.allLeadersFrom(@leaderboardName, options, callback)
+
+  allLeadersFrom: (leaderboardName, options = {}, callback) ->
+    if @reverse
+      @redisConnection.zrange(leaderboardName, 0, -1, (err, reply) =>
+        this.rankedInListIn(leaderboardName, reply, options, callback))
+    else
+      @redisConnection.zrevrange(leaderboardName, 0, -1, (err, reply) =>
+        this.rankedInListIn(leaderboardName, reply, options, callback))
 
     # membersFromScoreRange
     # membersFromScoreRangeIn
