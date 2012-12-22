@@ -17,6 +17,11 @@ check out the [Redis documentation](http://redis.io/documentation).
 
 ### Creating a leaderboard
 
+Create a new leaderboard or attach to an existing leaderboard named 'highscores':
+
+```javascript
+highscores = new Leaderboard('highscores')
+```
 
 ### Ranking members in the leaderboard
 
