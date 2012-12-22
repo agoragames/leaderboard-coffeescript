@@ -12,7 +12,7 @@
   "main": "./lib/leaderboard",
   "repository": {
     "type": "git",
-    "url": "git://github.com/czarneckid/leaderboard-coffeescript.git"
+    "url": "git://github.com/agoragames/leaderboard-coffeescript.git"
   },
   "keywords": [
     "leaderboard",
