@@ -15,6 +15,8 @@ check out the [Redis documentation](http://redis.io/documentation).
 
 ## Usage
 
+All methods take a callback as the final argument. The callback is non-optional for methods that return data.
+
 ### Creating a leaderboard
 
 Create a new leaderboard or attach to an existing leaderboard named 'highscores':
@@ -25,12 +27,87 @@ highscores = new Leaderboard('highscores')
 
 ### Ranking members in the leaderboard
 
+Add members to your leaderboard using `rankMember`:
+
+```javascript
+for index in [1..50]
+  highscores.rankMember("member_#{index}", index, "Optional member data for member #{index}", (reply) -> )
+```
+
+You can call `rankMember` with the same member and the leaderboard will be updated automatically.
+
+Get some information about your leaderboard:
+
+```javascript
+highscores.totalMembers((numMembers) -> ...)
+
+highscores.totalPages(Leaderboard.DEFAULT_PAGE_SIZE, (totalPages) -> ...)
+```
+
+Get some information about a specific member(s) in the leaderboard:
+
+```javascript
+highscores.scoreFor('member_5', (memberScore) -> ...)
+
+highscores.rankFor('member_5', (memberRank) -> ...)
+```
 
 ### Retrieving members from the leaderboard
 
+Get page 1 in the leaderboard:
+
+```javascript
+highscores.leaders(1, {'with_member_data': false}, (leaders) -> ...)
+```
+
+Get an "Around Me" leaderboard page for a given member, which pulls members above and below the given member:
+
+```javascript
+highscores.aroundMe('member_25', {'with_member_data': false}, (leaders) -> ...)
+```
+
+Get rank and score for an arbitrary list of members (e.g. friends) from the leaderboard:
+
+```javascript
+highscores.rankedInList(['member_5', 'member_17', 'member_1'], {'with_member_data': false}, (leaders) -> ...)
+```
+
+Retrieve members from the leaderboard in a given score range:
+
+```javascript
+highscores.membersFromScoreRange(10, 15, {'with_member_data': false}, (leaders) -> ...)
+```
+
+Retrieve a single member from the leaderboard at a given position:
+
+```javascript
+highscores.memberAt(4, {'with_member_data': false}, (member) -> ...)
+```
+
+Retrieve a range of members from the leaderboard within a given rank range:
+
+```javascript
+highscores.membersFromRankRange(5, 9, {'with_member_data': false}, (leaders) -> ...)
+```
 
 ### Conditionally rank a member in the leaderboard
 
+You can pass a function to the `rankMemberIf` method to conditionally rank a member in the leaderboard. The function is passed the following 5 parameters:
+
+* `member`: Member name.
+* `currentScore`: Current score for the member in the leaderboard. This property is currently supplied when calling the `rankMemberIf` method.
+* `score`: Member score.
+* `memberData`: Optional member data.
+* `options`: Leaderboard options, e.g. 'reverse': Value of reverse option
+
+```javascript
+highscoreCheck = (member, currentScore, score, memberData, leaderboardOptions) ->
+  return true if !currentScore?
+  return true if score > currentScore
+  false
+
+highscores.rankMemberIf(highscoreCheck, 'david', 1337, null, 'Optional member data', (reply) -> ...)
+```
 
 ## Performance Metrics
 
