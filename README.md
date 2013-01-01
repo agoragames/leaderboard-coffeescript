@@ -135,4 +135,4 @@ The following ports have been made of the [leaderboard gem](https://github.com/a
 
 ## Copyright
 
-Copyright (c) 2012 David Czarnecki. See LICENSE.txt for further details.
+Copyright (c) 2012-2013 David Czarnecki. See LICENSE.txt for further details.
