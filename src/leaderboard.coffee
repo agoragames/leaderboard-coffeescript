@@ -381,10 +381,10 @@ class Leaderboard
   rankForIn: (leaderboardName, member, callback) ->
     if @reverse
       @redisConnection.zrank(leaderboardName, member, (err, reply) ->
-        callback(reply + 1) if reply)
+        callback(reply + 1) if reply?)
     else
       @redisConnection.zrevrank(leaderboardName, member, (err, reply) ->
-        callback(reply + 1) if reply)
+        callback(reply + 1) if reply?)
 
   ###
   # Retrieve the score for a member in the leaderboard.
