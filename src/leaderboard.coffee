@@ -379,12 +379,17 @@ class Leaderboard
   # @return the rank for a member in the leaderboard.
   ###
   rankForIn: (leaderboardName, member, callback) ->
+    process_response = (err, reply) ->
+      if reply?
+        callback(reply + 1)
+      else
+        callback()
+
     if @reverse
-      @redisConnection.zrank(leaderboardName, member, (err, reply) ->
-        callback(reply + 1) if reply?)
+      @redisConnection.zrank(leaderboardName, member, process_response)
     else
-      @redisConnection.zrevrank(leaderboardName, member, (err, reply) ->
-        callback(reply + 1) if reply?)
+      @redisConnection.zrevrank(leaderboardName, member, process_response)
+
 
   ###
   # Retrieve the score for a member in the leaderboard.

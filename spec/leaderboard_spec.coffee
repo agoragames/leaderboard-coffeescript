@@ -145,6 +145,13 @@ describe 'Leaderboard', ->
       parseFloat(reply).should.equal(72.4)
       done())
 
+  it 'should return no score for a non member', (done) ->
+    @leaderboard.rankMember('member', 72.4, 'Optional member data', (reply) -> )
+
+    @leaderboard.scoreFor('david', (reply) ->
+      should_helper.not.exist(reply)
+      done())
+
   it 'should return the correct rank for a member', (done) ->
     for index in [0..5]
       @leaderboard.rankMember("member_#{index}", index, null, (reply) -> )
@@ -170,6 +177,14 @@ describe 'Leaderboard', ->
 
     @leaderboard.rankFor('member_0', (reply) ->
       reply.should.equal(6)
+      done())
+
+  it 'should return no rank for a non member', (done) ->
+    for index in [0..5]
+      @leaderboard.rankMember("member_#{index}", index, null, (reply) -> )
+
+    @leaderboard.rankFor('unknown', (reply) ->
+      should_helper.not.exist(reply)
       done())
 
   it 'should allow you to change the score for a member', (done) ->
