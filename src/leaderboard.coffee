@@ -148,6 +148,8 @@ class Leaderboard
   rankMemberIfIn: (leaderboardName, rankConditional, member, score, currentScore, memberData = null, callback) ->
     if rankConditional(member, currentScore, score, memberData, {'reverse': @reverse})
       this.rankMemberIn(leaderboardName, member, score, memberData, callback)
+    else
+      callback(0) if callback
 
   ###
   # Rank an array of members in the leaderboard.
@@ -379,12 +381,17 @@ class Leaderboard
   # @return the rank for a member in the leaderboard.
   ###
   rankForIn: (leaderboardName, member, callback) ->
+    process_response = (err, reply) ->
+      if reply?
+        callback(reply + 1)
+      else
+        callback()
+
     if @reverse
-      @redisConnection.zrank(leaderboardName, member, (err, reply) ->
-        callback(reply + 1) if reply)
+      @redisConnection.zrank(leaderboardName, member, process_response)
     else
-      @redisConnection.zrevrank(leaderboardName, member, (err, reply) ->
-        callback(reply + 1) if reply)
+      @redisConnection.zrevrank(leaderboardName, member, process_response)
+
 
   ###
   # Retrieve the score for a member in the leaderboard.
@@ -534,6 +541,8 @@ class Leaderboard
             else
               callback(percentile)
         )
+      else
+        callback()
     )
 
   ###
@@ -645,6 +654,9 @@ class Leaderboard
   # @return a page of leaders from the named leaderboard for a given list of members.
   ###
   rankedInListIn: (leaderboardName, members, options = {}, callback) ->
+    if not members? or members.length == 0
+      return callback([])
+
     ranksForMembers = []
     transaction = @redisConnection.multi()
     for member in members
@@ -895,6 +907,7 @@ class Leaderboard
           @redisConnection.zrange(leaderboardName, startingOffset, endingOffset, (err, reply) =>
             this.rankedInListIn(leaderboardName, reply, options, callback))
         else
+          callback([])
           []
       )
     else
@@ -907,6 +920,7 @@ class Leaderboard
           @redisConnection.zrevrange(leaderboardName, startingOffset, endingOffset, (err, reply) =>
             this.rankedInListIn(leaderboardName, reply, options, callback))
         else
+          callback([])
           []
       )
 
