@@ -417,6 +417,17 @@ describe 'Leaderboard', ->
       reply[12].member.should.equal('member_1')
       done())
 
+  it 'should always execute the callback when fetching the list of members around me', (done) ->
+    for index in [1..(Leaderboard.DEFAULT_PAGE_SIZE * 3 + 1)]
+      @leaderboard.rankMember("member_#{index}", index, "Optional member data for member #{index}", (reply) -> )
+
+    @leaderboard.totalMembers((reply) ->
+      reply.should.equal(Leaderboard.DEFAULT_PAGE_SIZE * 3 + 1))
+
+    @leaderboard.aroundMe('unknown', null, (reply) ->
+      reply.length.should.equal(0)
+      done())
+
   it 'should be able to rank multiple members at once', (done) ->
     @leaderboard.totalMembers((reply) ->
       reply.should.equal(0))

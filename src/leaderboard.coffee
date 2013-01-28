@@ -907,6 +907,7 @@ class Leaderboard
           @redisConnection.zrange(leaderboardName, startingOffset, endingOffset, (err, reply) =>
             this.rankedInListIn(leaderboardName, reply, options, callback))
         else
+          callback([])
           []
       )
     else
@@ -919,6 +920,7 @@ class Leaderboard
           @redisConnection.zrevrange(leaderboardName, startingOffset, endingOffset, (err, reply) =>
             this.rankedInListIn(leaderboardName, reply, options, callback))
         else
+          callback([])
           []
       )
 
