@@ -541,6 +541,8 @@ class Leaderboard
             else
               callback(percentile)
         )
+      else
+        callback()
     )
 
   ###

@@ -258,6 +258,24 @@ describe 'Leaderboard', ->
       reply.should.equal(92)
       done())
 
+  it 'should always execute the callback when calling percentile_for', (done) ->
+    for index in [1...13]
+      @leaderboard.rankMember("member_#{index}", index, null, (reply) -> )
+
+    @leaderboard.percentileFor('member_1', (reply) ->
+      reply.should.equal(0))
+    @leaderboard.percentileFor('member_2', (reply) ->
+      reply.should.equal(9))
+    @leaderboard.percentileFor('member_3', (reply) ->
+      reply.should.equal(17))
+    @leaderboard.percentileFor('member_4', (reply) ->
+      reply.should.equal(25))
+    @leaderboard.percentileFor('member_12', (reply) ->
+      reply.should.equal(92))
+    @leaderboard.percentileFor('unknown', (reply) ->
+      should_helper.not.exist(reply)
+      done())
+
   it 'should return the correct page when calling page_for for a given member', (done) ->
     @leaderboard.pageFor('jones', Leaderboard.DEFAULT_PAGE_SIZE, (reply) ->
       reply.should.equal(0))
