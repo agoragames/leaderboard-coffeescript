@@ -145,6 +145,13 @@ describe 'Leaderboard', ->
       parseFloat(reply).should.equal(72.4)
       done())
 
+  it 'should return no score for a non member', (done) ->
+    @leaderboard.rankMember('member', 72.4, 'Optional member data', (reply) -> )
+
+    @leaderboard.scoreFor('david', (reply) ->
+      should_helper.not.exist(reply)
+      done())
+
   it 'should return the correct rank for a member', (done) ->
     for index in [0..5]
       @leaderboard.rankMember("member_#{index}", index, null, (reply) -> )
@@ -154,6 +161,30 @@ describe 'Leaderboard', ->
 
     @leaderboard.rankFor('member_4', (reply) ->
       reply.should.equal(2)
+      done())
+
+  it 'should return the correct rank for the top member', (done) ->
+    for index in [0..5]
+      @leaderboard.rankMember("member_#{index}", index, null, (reply) -> )
+
+    @leaderboard.rankFor('member_5', (reply) ->
+      reply.should.equal(1)
+      done())
+
+  it 'should return the correct rank for the bottom member', (done) ->
+    for index in [0..5]
+      @leaderboard.rankMember("member_#{index}", index, null, (reply) -> )
+
+    @leaderboard.rankFor('member_0', (reply) ->
+      reply.should.equal(6)
+      done())
+
+  it 'should return no rank for a non member', (done) ->
+    for index in [0..5]
+      @leaderboard.rankMember("member_#{index}", index, null, (reply) -> )
+
+    @leaderboard.rankFor('unknown', (reply) ->
+      should_helper.not.exist(reply)
       done())
 
   it 'should allow you to change the score for a member', (done) ->
@@ -225,6 +256,24 @@ describe 'Leaderboard', ->
       reply.should.equal(25))
     @leaderboard.percentileFor('member_12', (reply) ->
       reply.should.equal(92)
+      done())
+
+  it 'should always execute the callback when calling percentile_for', (done) ->
+    for index in [1...13]
+      @leaderboard.rankMember("member_#{index}", index, null, (reply) -> )
+
+    @leaderboard.percentileFor('member_1', (reply) ->
+      reply.should.equal(0))
+    @leaderboard.percentileFor('member_2', (reply) ->
+      reply.should.equal(9))
+    @leaderboard.percentileFor('member_3', (reply) ->
+      reply.should.equal(17))
+    @leaderboard.percentileFor('member_4', (reply) ->
+      reply.should.equal(25))
+    @leaderboard.percentileFor('member_12', (reply) ->
+      reply.should.equal(92))
+    @leaderboard.percentileFor('unknown', (reply) ->
+      should_helper.not.exist(reply)
       done())
 
   it 'should return the correct page when calling page_for for a given member', (done) ->
@@ -302,6 +351,14 @@ describe 'Leaderboard', ->
       reply[0].rank.should.equal(21)
       done())
 
+  it 'should always execute the callback when calling ranked in list', (done) ->
+    for index in [0..25]
+      @leaderboard.rankMember("member_#{index}", index, "Optional member data for member #{index}", (reply) -> )
+
+    @leaderboard.rankedInList([], null, (reply) ->
+      reply.length.should.equal(0)
+      done())
+
   it 'should return the entire leaderboard when calling allLeaders', (done) ->
     for index in [0..25]
       @leaderboard.rankMember("member_#{index}", index, "Optional member data for member #{index}", (reply) -> )
@@ -360,6 +417,17 @@ describe 'Leaderboard', ->
       reply[12].member.should.equal('member_1')
       done())
 
+  it 'should always execute the callback when fetching the list of members around me', (done) ->
+    for index in [1..(Leaderboard.DEFAULT_PAGE_SIZE * 3 + 1)]
+      @leaderboard.rankMember("member_#{index}", index, "Optional member data for member #{index}", (reply) -> )
+
+    @leaderboard.totalMembers((reply) ->
+      reply.should.equal(Leaderboard.DEFAULT_PAGE_SIZE * 3 + 1))
+
+    @leaderboard.aroundMe('unknown', null, (reply) ->
+      reply.length.should.equal(0)
+      done())
+
   it 'should be able to rank multiple members at once', (done) ->
     @leaderboard.totalMembers((reply) ->
       reply.should.equal(0))
@@ -388,6 +456,22 @@ describe 'Leaderboard', ->
     @leaderboard.scoreFor('david', (reply) ->
       reply.should.equal(1338)
       done())
+
+  it 'should always execute the callback when ranking a member in the leaderboard with conditional execution', (done) ->
+    highscoreCheckAlwaysPass = (member, currentScore, score, memberData, leaderboardOptions) ->
+      true
+    highscoreCheckAlwaysFail = (member, currentScore, score, memberData, leaderboardOptions) ->
+      false
+
+    @leaderboard.totalMembers (reply) =>
+      reply.should.equal(0)
+      @leaderboard.rankMemberIf highscoreCheckAlwaysPass, 'david', 1337, 1337, 'Optional member data', (reply) =>
+        @leaderboard.scoreFor 'david', (reply) =>
+          reply.should.equal(1337)
+          @leaderboard.rankMemberIf highscoreCheckAlwaysFail, 'david', 1338, 1337, 'Optional member data', (reply) =>
+            @leaderboard.scoreFor 'david', (reply) =>
+              reply.should.equal(1337)
+              done()
 
   it 'should allow you to merge leaderboards', (done) ->
     foo = new Leaderboard('foo')
