@@ -654,6 +654,9 @@ class Leaderboard
   # @return a page of leaders from the named leaderboard for a given list of members.
   ###
   rankedInListIn: (leaderboardName, members, options = {}, callback) ->
+    if not members? or members.length == 0
+      return callback([])
+
     ranksForMembers = []
     transaction = @redisConnection.multi()
     for member in members

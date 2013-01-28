@@ -351,6 +351,14 @@ describe 'Leaderboard', ->
       reply[0].rank.should.equal(21)
       done())
 
+  it 'should always execute the callback when calling ranked in list', (done) ->
+    for index in [0..25]
+      @leaderboard.rankMember("member_#{index}", index, "Optional member data for member #{index}", (reply) -> )
+
+    @leaderboard.rankedInList([], null, (reply) ->
+      reply.length.should.equal(0)
+      done())
+
   it 'should return the entire leaderboard when calling allLeaders', (done) ->
     for index in [0..25]
       @leaderboard.rankMember("member_#{index}", index, "Optional member data for member #{index}", (reply) -> )
