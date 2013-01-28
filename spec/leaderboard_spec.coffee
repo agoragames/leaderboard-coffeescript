@@ -156,6 +156,22 @@ describe 'Leaderboard', ->
       reply.should.equal(2)
       done())
 
+  it 'should return the correct rank for the top member', (done) ->
+    for index in [0..5]
+      @leaderboard.rankMember("member_#{index}", index, null, (reply) -> )
+
+    @leaderboard.rankFor('member_5', (reply) ->
+      reply.should.equal(1)
+      done())
+
+  it 'should return the correct rank for the bottom member', (done) ->
+    for index in [0..5]
+      @leaderboard.rankMember("member_#{index}", index, null, (reply) -> )
+
+    @leaderboard.rankFor('member_0', (reply) ->
+      reply.should.equal(6)
+      done())
+
   it 'should allow you to change the score for a member', (done) ->
     @leaderboard.rankMember('member', 5, 'Optional member data', (reply) -> )
     @leaderboard.scoreFor('member', (reply) ->
