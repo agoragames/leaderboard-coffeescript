@@ -148,6 +148,8 @@ class Leaderboard
   rankMemberIfIn: (leaderboardName, rankConditional, member, score, currentScore, memberData = null, callback) ->
     if rankConditional(member, currentScore, score, memberData, {'reverse': @reverse})
       this.rankMemberIn(leaderboardName, member, score, memberData, callback)
+    else
+      callback(0) if callback
 
   ###
   # Rank an array of members in the leaderboard.

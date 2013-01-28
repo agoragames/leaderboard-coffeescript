@@ -420,6 +420,22 @@ describe 'Leaderboard', ->
       reply.should.equal(1338)
       done())
 
+  it 'should always execute the callback when ranking a member in the leaderboard with conditional execution', (done) ->
+    highscoreCheckAlwaysPass = (member, currentScore, score, memberData, leaderboardOptions) ->
+      true
+    highscoreCheckAlwaysFail = (member, currentScore, score, memberData, leaderboardOptions) ->
+      false
+
+    @leaderboard.totalMembers (reply) =>
+      reply.should.equal(0)
+      @leaderboard.rankMemberIf highscoreCheckAlwaysPass, 'david', 1337, 1337, 'Optional member data', (reply) =>
+        @leaderboard.scoreFor 'david', (reply) =>
+          reply.should.equal(1337)
+          @leaderboard.rankMemberIf highscoreCheckAlwaysFail, 'david', 1338, 1337, 'Optional member data', (reply) =>
+            @leaderboard.scoreFor 'david', (reply) =>
+              reply.should.equal(1337)
+              done()
+
   it 'should allow you to merge leaderboards', (done) ->
     foo = new Leaderboard('foo')
     bar = new Leaderboard('bar')
