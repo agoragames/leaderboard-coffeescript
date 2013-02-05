@@ -1,17 +1,17 @@
 redis = require 'redis'
 
 class Leaderboard
-  ### 
-  # Default page size: 25 
+  ###
+  # Default page size: 25
   ###
   @DEFAULT_PAGE_SIZE = 25
 
-  ### 
+  ###
   # Default options when creating a leaderboard. Page size is 25 and reverse
   # is set to false, meaning various methods will return results in
-  # highest-to-lowest order. 
+  # highest-to-lowest order.
   ###
-  DEFAULT_OPTIONS = 
+  DEFAULT_OPTIONS =
     'pageSize': @DEFAULT_PAGE_SIZE
     'reverse': false
 
@@ -85,7 +85,7 @@ class Leaderboard
   #
   # @param member [String] Member name.
   # @param score [float] Member score.
-  # @param memberData [Hash] Optional member data.
+  # @param memberData [String] Optional member data.
   # @param callback Optional callback for result of call.
   ###
   rankMember: (member, score, memberData = null, callback) ->
@@ -97,7 +97,7 @@ class Leaderboard
   # @param leaderboardName [String] Name of the leaderboard.
   # @param member [String] Member name.
   # @param score [float] Member score.
-  # @param memberData [Hash] Optional member data.
+  # @param memberData [String] Optional member data.
   # @param callback Optional callback for result of call.
   ###
   rankMemberIn: (leaderboardName, member, score, memberData = null, callback) ->
@@ -108,7 +108,7 @@ class Leaderboard
       callback(reply) if callback)
 
   ###
-  # Rank a member in the leaderboard based on execution of the +rankConditional+. 
+  # Rank a member in the leaderboard based on execution of the +rankConditional+.
   #
   # The +rankConditional+ is passed the following parameters:
   #   member: Member name.
@@ -121,14 +121,14 @@ class Leaderboard
   # @param member [String] Member name.
   # @param score [float] Member score.
   # @param currentScore [float] Current score.
-  # @param memberData [Hash] Optional member_data.
+  # @param memberData [String] Optional member data.
   # @param callback Optional callback for result of call.
   ###
   rankMemberIf: (rankConditional, member, score, currentScore, memberData = null, callback) ->
     this.rankMemberIfIn(@leaderboardName, rankConditional, member, score, currentScore, memberData, callback)
 
   ###
-  # Rank a member in the named leaderboard based on execution of the +rankConditional+. 
+  # Rank a member in the named leaderboard based on execution of the +rankConditional+.
   #
   # The +rankConditional+ is passed the following parameters:
   #   member: Member name.
@@ -142,8 +142,8 @@ class Leaderboard
   # @param member [String] Member name.
   # @param score [float] Member score.
   # @param currentScore [float] Current score.
-  # @param memberData [Hash] Optional memberData.
-  # @param callback Optional callback for result of call. 
+  # @param memberData [String] Optional member data.
+  # @param callback Optional callback for result of call.
   ###
   rankMemberIfIn: (leaderboardName, rankConditional, member, score, currentScore, memberData = null, callback) ->
     if rankConditional(member, currentScore, score, memberData, {'reverse': @reverse})
@@ -181,7 +181,7 @@ class Leaderboard
   # @param member [String] Member name.
   # @param callback Callback for result of call.
   #
-  # @return Hash of optional member data.
+  # @return String of optional member data.
   ###
   memberDataFor: (member, callback) ->
     this.memberDataForIn(@leaderboardName, member, callback)
@@ -193,7 +193,7 @@ class Leaderboard
   # @param member [String] Member name.
   # @param callback Callback for result of call.
   #
-  # @return Hash of optional member data.
+  # @return String of optional member data.
   ###
   memberDataForIn: (leaderboardName, member, callback = ->) ->
     @redisConnection.hget(this.memberDataKey(leaderboardName), member, (err, reply) ->
@@ -203,7 +203,7 @@ class Leaderboard
   # Update the optional member data for a given member in the leaderboard.
   #
   # @param member [String] Member name.
-  # @param memberData [Hash] Optional member data.
+  # @param memberData [String] Optional member data.
   # @param callback Optional callback for result of call.
   ###
   updateMemberData: (member, memberData, callback) ->
@@ -214,7 +214,7 @@ class Leaderboard
   #
   # @param leaderboardName [String] Name of the leaderboard.
   # @param member [String] Member name.
-  # @param memberData [Hash] Optional member data.
+  # @param memberData [String] Optional member data.
   # @param callback Optional callback for result of call.
   ###
   updateMemberDataFor: (leaderboardName, member, memberData, callback) ->
@@ -365,7 +365,7 @@ class Leaderboard
   #
   # @param member [String] Member name.
   # @param callback Callback for result of call.
-  # 
+  #
   # @return the rank for a member in the leaderboard.
   ###
   rankFor: (member, callback) ->
@@ -377,7 +377,7 @@ class Leaderboard
   # @param leaderboardName [String] Name of the leaderboard.
   # @param member [String] Member name.
   # @param callback Callback for result of call.
-  # 
+  #
   # @return the rank for a member in the leaderboard.
   ###
   rankForIn: (leaderboardName, member, callback) ->
@@ -409,7 +409,7 @@ class Leaderboard
   #
   # @param leaderboardName Name of the leaderboard.
   # @param member [String] Member name.
-  # @param callback Callback for result of call.  
+  # @param callback Callback for result of call.
   #
   # @return the score for a member in the leaderboard or +nil+ if the member is not in the leaderboard.
   ###
@@ -460,7 +460,7 @@ class Leaderboard
   #
   # @param leaderboardName [String]Name of the leaderboard.
   # @param member [String] Member name.
-  # @param callback Callback for result of call.  
+  # @param callback Callback for result of call.
   #
   # @return the score and rank for a member in the named leaderboard as a Hash.
   ###
@@ -490,7 +490,7 @@ class Leaderboard
   #
   # @param minScore [float] Minimum score.
   # @param maxScore [float] Maximum score.
-  # @param callback Optional callback for result of call.  
+  # @param callback Optional callback for result of call.
   ###
   removeMembersInScoreRange: (minScore, maxScore, callback) ->
     this.removeMembersInScoreRangeIn(@leaderboardName, minScore, maxScore)
@@ -898,7 +898,7 @@ class Leaderboard
   ###
   aroundMeIn: (leaderboardName, member, options = {}, callback) ->
     if @reverse
-      @redisConnection.zrank(leaderboardName, member, (err, reply) => 
+      @redisConnection.zrank(leaderboardName, member, (err, reply) =>
         if reply?
           startingOffset = parseInt(Math.ceil(reply - (@pageSize / 2)))
           startingOffset = 0 if startingOffset < 0
@@ -964,7 +964,7 @@ class Leaderboard
   # Key for retrieving optional member data.
   #
   # @param leaderboardName [String] Name of the leaderboard.
-  # 
+  #
   # @return a key in the form of +leaderboardName:member_data+
   ###
   memberDataKey: (leaderboardName) ->
