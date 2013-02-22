@@ -304,21 +304,25 @@ describe 'Leaderboard', ->
 
   it 'should set an expire on the leaderboard', (done) ->
     for index in [0...5]
-      @leaderboard.rankMember("member_#{index}", index, null, (reply) -> )
+      @leaderboard.rankMember("member_#{index}", index, "Optional member data for member #{index}", (reply) -> )
 
     @leaderboard.expireLeaderboard(5, (reply) -> )
     @leaderboard.redisConnection.ttl(@leaderboard.leaderboardName, (err, reply) ->
+      reply.should.be.below(6).and.above(1))
+    @leaderboard.redisConnection.ttl(@leaderboard.memberDataKey(@leaderboard.leaderboardName), (err, reply) ->
       reply.should.be.below(6).and.above(1)
       done())
 
   it 'should set an expire on the leaderboard using a timestamp', (done) ->
     for index in [0...5]
-      @leaderboard.rankMember("member_#{index}", index, null, (reply) -> )
+      @leaderboard.rankMember("member_#{index}", index, "Optional member data for member #{index}", (reply) -> )
 
     timestamp = Math.round(+new Date() / 1000)
     timestamp += 10
 
     @leaderboard.expireLeaderboardAt(timestamp, (reply) -> )
+    @leaderboard.redisConnection.ttl(@leaderboard.leaderboardName, (err, reply) ->
+      reply.should.be.above(0).and.below(11))
     @leaderboard.redisConnection.ttl(@leaderboard.leaderboardName, (err, reply) ->
       reply.should.be.above(0).and.below(11)
       done())

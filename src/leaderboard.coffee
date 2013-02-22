@@ -604,8 +604,11 @@ class Leaderboard
   # @param callback Optional callback for result of call.
   ###
   expireLeaderboardFor: (leaderboardName, seconds, callback) ->
-    @redisConnection.expire(leaderboardName, seconds, (err, reply) ->
-      callback(reply) if callback)
+    transaction = @redisConnection.multi()
+    transaction.expire(leaderboardName, seconds)
+    transaction.expire(this.memberDataKey(leaderboardName), seconds)
+    transaction.exec((err, replies) ->
+      callback(replies) if callback)
 
   ###
   # Expire the current leaderboard at a specific UNIX timestamp. Do not use this with
@@ -628,8 +631,11 @@ class Leaderboard
   # @param callback Optional callback for result of call.
   ###
   expireLeaderboardAtFor: (leaderboardName, timestamp, callback) ->
-    @redisConnection.expireat(leaderboardName, timestamp, (err, reply) ->
-      callback(reply) if callback)
+    transaction = @redisConnection.multi()    
+    transaction.expireat(leaderboardName, timestamp)
+    transaction.expireat(this.memberDataKey(leaderboardName), timestamp)
+    transaction.exec((err, replies) ->
+      callback(replies) if callback)
 
   ###
   # Retrieve a page of leaders from the leaderboard for a given list of members.
