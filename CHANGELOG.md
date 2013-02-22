@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 1.0.0 (2013-02-22)
+
+* Version 1.0.0!
+* Fixed a data leak in `expireLeaderboard` and `expireLeaderboardAt` to also set expiration on the member data hash.
+
 ## 0.2.0
 
 * Ensure the passed callback function is triggered when operations fail or are otherwise unable to complete. Pull request [#4](https://github.com/agoragames/leaderboard-coffeescript/pull/4)
