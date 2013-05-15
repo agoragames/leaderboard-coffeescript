@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.1.0 (2013-05-15)
+
+* Added `members_only` option for various leaderboard requests.
+
 ## 1.0.0 (2013-02-22)
 
 * Version 1.0.0!
