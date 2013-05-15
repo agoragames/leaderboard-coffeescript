@@ -6,9 +6,7 @@ Builds off ideas proposed in http://blog.agoragames.com/2011/01/01/creating-high
 
 ## Installation
 
-`npm install ???`
-
-TBD: Figure out what to do here since there's already a leaderboard library on npmjs.org :(
+`npm install agoragames-leaderboard
 
 Make sure your redis server is running! Redis configuration is outside the scope of this README, but
 check out the [Redis documentation](http://redis.io/documentation).
