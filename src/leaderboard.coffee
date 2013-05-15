@@ -631,7 +631,7 @@ class Leaderboard
   # @param callback Optional callback for result of call.
   ###
   expireLeaderboardAtFor: (leaderboardName, timestamp, callback) ->
-    transaction = @redisConnection.multi()    
+    transaction = @redisConnection.multi()
     transaction.expireat(leaderboardName, timestamp)
     transaction.expireat(this.memberDataKey(leaderboardName), timestamp)
     transaction.exec((err, replies) ->
@@ -665,24 +665,27 @@ class Leaderboard
 
     ranksForMembers = []
     transaction = @redisConnection.multi()
-    for member in members
-      if @reverse
-        transaction.zrank(@leaderboardName, member)
-      else
-        transaction.zrevrank(@leaderboardName, member)
-      transaction.zscore(@leaderboardName, member)
+
+    unless options['members_only']
+      for member in members
+        if @reverse
+          transaction.zrank(@leaderboardName, member)
+        else
+          transaction.zrevrank(@leaderboardName, member)
+        transaction.zscore(@leaderboardName, member)
 
     transaction.exec((err, replies) =>
       for member, index in members
         do (member) =>
           data = {}
           data['member'] = member
-          data['rank'] = replies[index * 2] + 1
-          if replies[index * 2 + 1]
-            data['score'] = parseFloat(replies[index * 2 + 1])
-          else
-            data['score'] = null
-            data['rank'] = null
+          unless options['members_only']
+            data['rank'] = replies[index * 2] + 1
+            if replies[index * 2 + 1]
+              data['score'] = parseFloat(replies[index * 2 + 1])
+            else
+              data['score'] = null
+              data['rank'] = null
 
           # Retrieve optional member data based on options['with_member_data']
           if options['with_member_data']
