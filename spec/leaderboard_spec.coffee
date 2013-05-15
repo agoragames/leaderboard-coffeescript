@@ -4,7 +4,7 @@ describe 'Leaderboard', ->
 
   beforeEach ->
     @leaderboard = new Leaderboard('highscores')
-  
+
   afterEach ->
     @redisConnection.flushdb()
 
@@ -16,7 +16,7 @@ describe 'Leaderboard', ->
     done()
 
   it 'should initialize the leaderboard correctly with options', (done) ->
-    updated_options = 
+    updated_options =
       'pageSize': -1
       'reverse': true
 
@@ -62,7 +62,7 @@ describe 'Leaderboard', ->
 
     @leaderboard.totalMembers((reply) ->
       reply.should.equal(1))
-    
+
     @leaderboard.memberDataFor('member', (reply) ->
       reply.should.equal('Optional member data')
       done())
@@ -141,7 +141,7 @@ describe 'Leaderboard', ->
     @leaderboard.scoreFor('david', (reply) ->
       should_helper.not.exist(reply))
 
-    @leaderboard.scoreFor('member', (reply) -> 
+    @leaderboard.scoreFor('member', (reply) ->
       parseFloat(reply).should.equal(72.4)
       done())
 
@@ -156,7 +156,7 @@ describe 'Leaderboard', ->
     for index in [0..5]
       @leaderboard.rankMember("member_#{index}", index, null, (reply) -> )
 
-    @leaderboard.rankFor('unknown', (reply) -> 
+    @leaderboard.rankFor('unknown', (reply) ->
       should_helper.not.exist(reply))
 
     @leaderboard.rankFor('member_4', (reply) ->
@@ -375,7 +375,7 @@ describe 'Leaderboard', ->
     for index in [0..25]
       @leaderboard.rankMember("member_#{index}", index, "Optional member data for member #{index}", (reply) -> )
 
-    @leaderboard.membersFromScoreRange(10, 15, null, (reply) -> 
+    @leaderboard.membersFromScoreRange(10, 15, null, (reply) ->
       reply.length.should.equal(6)
       reply[0].member.should.equal('member_15')
       reply[5].member.should.equal('member_10')
@@ -450,7 +450,7 @@ describe 'Leaderboard', ->
 
     @leaderboard.totalMembers((reply) ->
       reply.should.equal(0))
-    @leaderboard.rankMemberIf(highscoreCheck, 'david', 1337, null, 'Optional member data', (reply) -> )   
+    @leaderboard.rankMemberIf(highscoreCheck, 'david', 1337, null, 'Optional member data', (reply) -> )
     @leaderboard.scoreFor('david', (reply) ->
       reply.should.equal(1337))
     @leaderboard.rankMemberIf(highscoreCheck, 'david', 1336, 1337, 'Optional member data', (reply) -> )
@@ -487,7 +487,7 @@ describe 'Leaderboard', ->
         bar.rankMember('bar_1', 1, null, (reply) ->
           bar.rankMember('bar_2', 2, null, (reply) ->
             bar.rankMember('bar_3', 3, null, (reply) ->
-              foo.mergeLeaderboards('foobar', ['bar'], null, (reply) -> 
+              foo.mergeLeaderboards('foobar', ['bar'], null, (reply) ->
                 reply.should.equal(5)
                 foobar.totalMembers((numMembers) ->
                   numMembers.should.equal(5)
@@ -504,8 +504,46 @@ describe 'Leaderboard', ->
           bar.rankMember('bar_1', 3, null, (reply) ->
             bar.rankMember('foo_1', 4, null, (reply) ->
               bar.rankMember('bar_3', 5, null, (reply) ->
-                foo.intersectLeaderboards('foobar', ['bar'], null, (reply) -> 
+                foo.intersectLeaderboards('foobar', ['bar'], null, (reply) ->
                   reply.should.equal(2)
                   foobar.totalMembers((numMembers) ->
                     numMembers.should.equal(2)
                     done()))))))))
+
+  it 'should return the members only if the members_only option is passed', (done) ->
+    for index in [0..25]
+      @leaderboard.rankMember("member_#{index}", index, "Optional member data for member #{index}", (reply) -> )
+
+    @leaderboard.leaders(1, {'members_only': true}, (reply) ->
+      reply[0].should.eql({'member': 'member_25'})
+      for member in reply
+        member.should.have.keys('member'))
+
+    @leaderboard.allLeaders({'members_only': true}, (reply) ->
+      reply.length.should.equal(26)
+      for member in reply
+        member.should.have.keys('member'))
+
+    @leaderboard.membersFromScoreRange(10, 14, {'members_only': true}, (reply) ->
+      reply.length.should.equal(5)
+      for member in reply
+        member.should.have.keys('member'))
+
+    @leaderboard.membersFromRankRange(1, 5, {'members_only': true}, (reply) ->
+      reply.length.should.equal(5)
+      for member in reply
+        member.should.have.keys('member'))
+
+    @leaderboard.aroundMe('member_10', {'page_size': 3, 'members_only': true}, (reply) ->
+      reply.length.should.equal(3)
+      for member in reply
+        member.should.have.keys('member'))
+
+    @leaderboard.rankedInList(['member_1', 'member_20'], {'members_only': true}, (reply) ->
+      reply.lenght.should.equal(2)
+      for member in reply
+        member.should.have.keys('member'))
+
+    done()
+
+
