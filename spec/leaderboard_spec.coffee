@@ -242,6 +242,42 @@ describe 'Leaderboard', ->
       reply.should.equal(5)
       done())
 
+  it 'should allow you to remove members outside a given rank', (done) ->
+    for index in [0...6]
+      @leaderboard.rankMember("member_#{index}", index, null, (reply) -> )
+
+    @leaderboard.totalMembers((reply) ->
+      reply.should.equal(6))
+
+    @leaderboard.removeMembersOutsideRank(3, (reply) ->
+      reply.should.equal(3))
+
+    @leaderboard.leaders(1, {'with_member_data': true}, (reply) ->
+      reply.length.should.equal(3)
+      reply[0]['member'].should.equal('member_5')
+      reply[2]['member'].should.equal('member_3'))
+
+    updated_options =
+      'pageSize': -1
+      'reverse': true
+
+    reverse_leaderboard = new Leaderboard('reverse_highscores', updated_options)
+
+    for index in [0...5]
+      reverse_leaderboard.rankMember("member_#{index}", index, null, (reply) -> )
+
+    reverse_leaderboard.totalMembers((reply) ->
+      reply.should.equal(5))
+
+    reverse_leaderboard.removeMembersOutsideRank(3, (reply) ->
+      reply.should.equal(2))
+
+    reverse_leaderboard.leaders(1, {'with_member_data': true}, (reply) ->
+      reply.length.should.equal(3)
+      reply[0]['member'].should.equal('member_0')
+      reply[2]['member'].should.equal('member_2')
+      done())
+
   it 'should return the correct information when calling percentile_for', (done) ->
     for index in [1...13]
       @leaderboard.rankMember("member_#{index}", index, null, (reply) -> )
