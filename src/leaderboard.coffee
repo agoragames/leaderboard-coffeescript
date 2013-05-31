@@ -195,7 +195,7 @@ class Leaderboard
   #
   # @return String of optional member data.
   ###
-  memberDataForIn: (leaderboardName, member, callback = ->) ->
+  memberDataForIn: (leaderboardName, member, callback) ->
     @redisConnection.hget(this.memberDataKey(leaderboardName), member, (err, reply) ->
       callback(reply))
 
@@ -493,7 +493,7 @@ class Leaderboard
   # @param callback Optional callback for result of call.
   ###
   removeMembersInScoreRange: (minScore, maxScore, callback) ->
-    this.removeMembersInScoreRangeIn(@leaderboardName, minScore, maxScore)
+    this.removeMembersInScoreRangeIn(@leaderboardName, minScore, maxScore, callback)
 
   ###
   # Remove members from the named leaderboard in a given score range.
@@ -506,6 +506,32 @@ class Leaderboard
   removeMembersInScoreRangeIn: (leaderboardName, minScore, maxScore, callback) ->
     @redisConnection.zremrangebyscore(leaderboardName, minScore, maxScore, (err, reply) ->
       callback(reply) if callback)
+
+  ###
+  # Remove members from the leaderboard outside a given rank.
+  #
+  # @param rank [int] The rank (inclusive) which we should keep.
+  # @param callback Optional callback for result of call.
+  # @return the total number of members removed.
+  ###
+  removeMembersOutsideRank: (rank, callback) ->
+    this.removeMembersOutsideRankIn(@leaderboardName, rank, callback)
+
+  ###
+  # Remove members from the leaderboard outside a given rank.
+  #
+  # @param leaderboard_name [String] Name of the leaderboard.
+  # @param rank [int] The rank (inclusive) which we should keep.
+  # @param callback Optional callback for result of call.
+  # @return the total number of members removed.
+  ###
+  removeMembersOutsideRankIn: (leaderboardName, rank, callback) ->
+    if @reverse
+      @redisConnection.zremrangebyrank(leaderboardName, rank, -1, (err, reply) ->
+        callback(reply) if callback)
+    else
+      @redisConnection.zremrangebyrank(leaderboardName, 0, -(rank) - 1, (err, reply) ->
+        callback(reply) if callback)
 
   ###
   # Retrieve the percentile for a member in the leaderboard.
