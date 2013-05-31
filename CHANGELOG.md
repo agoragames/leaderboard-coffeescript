@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.2.0 (2013-05-31)
+
+* Added `removeMembersOutsideRank` method to remove members from the leaderboard outside a given rank.
+
 ## 1.1.0 (2013-05-15)
 
 * Added `members_only` option for various leaderboard requests.
