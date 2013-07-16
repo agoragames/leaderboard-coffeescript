@@ -546,6 +546,14 @@ describe 'Leaderboard', ->
                     numMembers.should.equal(2)
                     done()))))))))
 
+  it 'should allow you to rank a member across multiple leaderboards', (done) ->
+    @leaderboard.rankMemberAcross(['some_highscores', 'more_highscores'], 'david', 50000, {'member_name': 'David'}, (reply) ->)
+    @leaderboard.leadersIn('some_highscores', 1, null, (reply) ->
+      reply.length.should.equal(1))
+    @leaderboard.leadersIn('more_highscores', 1, null, (reply) ->
+      reply.length.should.equal(1)
+      done())
+
   it 'should return the members only if the members_only option is passed', (done) ->
     for index in [0..25]
       @leaderboard.rankMember("member_#{index}", index, "Optional member data for member #{index}", (reply) -> )
@@ -581,5 +589,3 @@ describe 'Leaderboard', ->
         member.should.have.keys('member'))
 
     done()
-
-
