@@ -122,6 +122,12 @@ You can pass various options to the calls `leaders`, `allLeaders`, `aroundMe`, `
 * `members_only` - `true` or `false` to return only the members without their score and rank.
 * `sort_option` - Valid values for `sort_option` are `score` and `rank`.
 
+### Ranking a member across multiple leaderboards
+
+```ruby
+highscores.rankMemberAcross(['highscores', 'more_highscores'], 'david', 50000, { 'member_name': 'david' }, (reply) -> ...)
+```
+
 ## Performance Metrics
 
 You can view [performance metrics](https://github.com/agoragames/leaderboard#performance-metrics) for the
