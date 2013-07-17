@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## master
+## 1.3.0 (2013-07-17)
 
 * Added `rankMemberAcross` method to be able to rank a member across multiple leaderboards at once.
 * Fixed bug in `rankedInListIn` method that would not correctly use the `leaderboardName` argument.
