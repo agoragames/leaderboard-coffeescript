@@ -108,6 +108,22 @@ class Leaderboard
       callback(reply) if callback)
 
   ###
+  # Rank a member across multiple leaderboards.
+  #
+  # @param leaderboards [Array] Leaderboard names.
+  # @param member [String] Member name.
+  # @param score [float] Member score.
+  # @param member_data [String] Optional member data.
+  ###
+  rankMemberAcross: (leaderboardNames, member, score, memberData = null, callback) ->
+    transaction = @redisConnection.multi()
+    for leaderboardName in leaderboardNames
+      transaction.zadd(leaderboardName, score, member)
+      transaction.hset(this.memberDataKey(leaderboardName), member, memberData) if memberData?
+    transaction.exec((err, reply) ->
+      callback(reply) if callback)
+
+  ###
   # Rank a member in the leaderboard based on execution of the +rankConditional+.
   #
   # The +rankConditional+ is passed the following parameters:
@@ -695,10 +711,10 @@ class Leaderboard
     unless options['members_only']
       for member in members
         if @reverse
-          transaction.zrank(@leaderboardName, member)
+          transaction.zrank(leaderboardName, member)
         else
-          transaction.zrevrank(@leaderboardName, member)
-        transaction.zscore(@leaderboardName, member)
+          transaction.zrevrank(leaderboardName, member)
+        transaction.zscore(leaderboardName, member)
 
     transaction.exec((err, replies) =>
       for member, index in members
@@ -715,7 +731,7 @@ class Leaderboard
 
           # Retrieve optional member data based on options['with_member_data']
           if options['with_member_data']
-            this.memberDataForIn @leaderboardName, member, (memberdata) =>
+            this.memberDataForIn leaderboardName, member, (memberdata) =>
               data['member_data'] = memberdata
               ranksForMembers.push(data)
               # Sort if options['sort_by']
