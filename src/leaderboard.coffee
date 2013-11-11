@@ -588,6 +588,50 @@ class Leaderboard
     )
 
   ###
+  # Calculate the score for a given percentile value in the leaderboard.
+  #
+  # @param percentile [float] Percentile value (0.0 to 100.0 inclusive)
+  # @param callback Callback for result of call.
+  #
+  # @return the calculated score for the requested percentile value. Return +nil+ for an invalid (outside 0-100) percentile or a leaderboard with no members.
+  ###
+  scoreForPercentile: (percentile, callback) ->
+    this.scoreForPercentileIn(@leaderboardName, percentile, callback)
+
+  ###
+  # Calculate the score for a given percentile value in the leaderboard.
+  #
+  # @param leaderboardName [String] Name of the leaderboard.
+  # @param percentile [float] Percentile value (0.0 to 100.0 inclusive)
+  # @param callback Callback for result of call.
+  #
+  # @return the calculated score for the requested percentile value. Return +nil+ for an invalid (outside 0-100) percentile or a leaderboard with no members.
+  ###
+  scoreForPercentileIn: (leaderboardName, percentile, callback) ->
+    unless 0 <= percentile <= 100
+      return callback()
+    if @reverse
+      percentile = 100 - percentile
+    this.totalMembersIn(leaderboardName, (reply) =>
+      totalMembers = reply
+      if totalMembers == 0
+        return callback()
+      else
+        index = (totalMembers - 1) * (percentile / 100)
+        zrange_args = [leaderboardName, Math.floor(index), Math.ceil(index), 'WITHSCORES']
+        @redisConnection.zrange(zrange_args, (err, reply) ->
+          # Response format: ["Alice", "123", "Bob", "456"] (i.e. flat list, not member/score tuples)
+          lowScore = parseFloat(reply[1])
+          if index == Math.floor(index)
+            callback(lowScore)
+          else
+            interpolateFraction = index - Math.floor(index)
+            hiScore = parseFloat(reply[3])
+            callback(lowScore + interpolateFraction * (hiScore - lowScore))
+        )
+    )
+
+  ###
   # Determine the page where a member falls in the leaderboard.
   #
   # @param member [String] Member name.

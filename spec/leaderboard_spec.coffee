@@ -312,6 +312,32 @@ describe 'Leaderboard', ->
       should_helper.not.exist(reply)
       done())
 
+  it 'should return the correct information when calling score_for_percentile', (done) ->
+    for index in [1...6]
+      @leaderboard.rankMember("member_#{index}", index, null, (reply) -> )
+
+    @leaderboard.scoreForPercentile(0, (reply) ->
+      reply.should.equal(1.0))
+    @leaderboard.scoreForPercentile(75, (reply) ->
+      reply.should.equal(4.0))
+    @leaderboard.scoreForPercentile(87.5, (reply) ->
+      reply.should.equal(4.5))
+    @leaderboard.scoreForPercentile(93.75, (reply) ->
+      reply.should.equal(4.75))
+    @leaderboard.scoreForPercentile(100, (reply) ->
+      reply.should.equal(5.0)
+      done())
+
+  it 'should always execute the callback when calling score_for_percentile', (done) ->
+    for index in [1...2]
+      @leaderboard.rankMember("member_#{index}", index, null, (reply) -> )
+
+    @leaderboard.scoreForPercentile(0, (reply) ->
+      reply.should.equal(1.0))
+    @leaderboard.scoreForPercentile(101, (reply) ->
+      should_helper.not.exist(reply)
+      done())
+
   it 'should return the correct page when calling page_for for a given member', (done) ->
     @leaderboard.pageFor('jones', Leaderboard.DEFAULT_PAGE_SIZE, (reply) ->
       reply.should.equal(0))
