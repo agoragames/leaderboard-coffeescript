@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.4.0 (2013-11-12)
+
+* Added `scoreForPercentile` method to be able to calculate the score for a given percentile value in the leaderboard.
+
 ## 1.3.0 (2013-07-17)
 
 * Added `rankMemberAcross` method to be able to rank a member across multiple leaderboards at once.
