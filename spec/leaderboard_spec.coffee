@@ -3,7 +3,7 @@ describe 'Leaderboard', ->
     @redisConnection = redis.createClient(6379, 'localhost')
 
   beforeEach ->
-    @leaderboard = new Leaderboard('highscores')
+    @leaderboard = new Leaderboard('highscores', Leaderboard.DEFAULT_OPTIONS)
 
   afterEach ->
     @redisConnection.flushdb()
@@ -540,9 +540,9 @@ describe 'Leaderboard', ->
               done()
 
   it 'should allow you to merge leaderboards', (done) ->
-    foo = new Leaderboard('foo')
-    bar = new Leaderboard('bar')
-    foobar = new Leaderboard('foobar')
+    foo = new Leaderboard('foo', Leaderboard.DEFAULT_OPTIONS)
+    bar = new Leaderboard('bar', Leaderboard.DEFAULT_OPTIONS)
+    foobar = new Leaderboard('foobar', Leaderboard.DEFAULT_OPTIONS)
 
     foo.rankMember('foo_1', 1, null, (reply) ->
       foo.rankMember('foo_2', 2, null, (reply) ->
@@ -556,9 +556,9 @@ describe 'Leaderboard', ->
                   done())))))))
 
   it 'should allow you to intersect leaderboards', (done) ->
-    foo = new Leaderboard('foo')
-    bar = new Leaderboard('bar')
-    foobar = new Leaderboard('foobar')
+    foo = new Leaderboard('foo', Leaderboard.DEFAULT_OPTIONS)
+    bar = new Leaderboard('bar', Leaderboard.DEFAULT_OPTIONS)
+    foobar = new Leaderboard('foobar', Leaderboard.DEFAULT_OPTIONS)
 
     foo.rankMember('foo_1', 1, null, (reply) ->
       foo.rankMember('foo_2', 2, null, (reply) ->
