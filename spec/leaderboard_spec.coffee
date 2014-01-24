@@ -27,6 +27,29 @@ describe 'Leaderboard', ->
 
     done()
 
+  it 'should allow you to set custom keys for member, score, rank and member_data', (done) ->
+    options =
+      'pageSize': Leaderboard.DEFAULT_PAGE_SIZE
+      'reverse': false
+      'memberKey': 'member_custom'
+      'rankKey': 'rank_custom'
+      'scoreKey': 'score_custom'
+      'memberDataKey': 'member_data_custom'
+
+
+    @leaderboard = new Leaderboard('highscores', options)
+
+    for index in [0...Leaderboard.DEFAULT_PAGE_SIZE + 1]
+      @leaderboard.rankMember("member_#{index}", index, "member_data_#{index}", (reply) -> )
+
+    @leaderboard.leaders(1, {'with_member_data': true}, (reply) ->
+      reply.length.should.equal(25)
+      reply[0]['member_custom'].should.equal('member_25')
+      reply[0]['score_custom'].should.equal(25)
+      reply[0]['rank_custom'].should.equal(1)
+      reply[0]['member_data_custom'].should.equal('member_data_25')
+      done())
+
   it 'should allow you to disconnect the Redis connection', (done) ->
     @leaderboard.disconnect()
     done()
