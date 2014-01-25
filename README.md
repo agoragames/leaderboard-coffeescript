@@ -6,7 +6,7 @@ Builds off ideas proposed in http://www.agoragames.com/blog/2011/01/01/creating-
 
 ## Installation
 
-`npm install agoragames-leaderboard
+`npm install agoragames-leaderboard`
 
 Make sure your redis server is running! Redis configuration is outside the scope of this README, but
 check out the [Redis documentation](http://redis.io/documentation).
