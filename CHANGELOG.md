@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.5.0 (2014-01-24)
+
+* Allow for custom keys to be set for customizing the data returned from calls like leaders or aroundMe [#11](https://github.com/agoragames/leaderboard-coffeescript/pull/11)
+
 ## 1.4.0 (2013-11-12)
 
 * Added `scoreForPercentile` method to be able to calculate the score for a given percentile value in the leaderboard.
