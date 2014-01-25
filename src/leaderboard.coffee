@@ -14,6 +14,10 @@ class Leaderboard
   DEFAULT_OPTIONS =
     'pageSize': @DEFAULT_PAGE_SIZE
     'reverse': false
+    'memberKey': 'member'
+    'rankKey': 'rank'
+    'scoreKey': 'score'
+    'memberDataKey': 'member_data'
 
   ###
   # Default Redis host: localhost
@@ -45,6 +49,10 @@ class Leaderboard
     @pageSize = options['pageSize']
     if @pageSize == null || @pageSize < 1
       @pageSize = Leaderboard.DEFAULT_PAGE_SIZE
+    @memberKeyOption = options['memberKey'] || 'member'
+    @rankKeyOption = options['rankKey'] || 'rank'
+    @scoreKeyOption = options['scoreKey'] || 'score'
+    @memberDataKeyOption = options['memberDataKey'] || 'member_data'
 
     @redisConnection = redisOptions['redis_connection']
 
@@ -487,18 +495,19 @@ class Leaderboard
       transaction.zrank(leaderboardName, member)
     else
       transaction.zrevrank(leaderboardName, member)
-    transaction.exec((err, replies) ->
+
+    transaction.exec((err, replies) =>
       if replies
         scoreAndRankData = {}
         if replies[0]?
-          scoreAndRankData['score'] = parseFloat(replies[0])
+          scoreAndRankData[@scoreKeyOption] = parseFloat(replies[0])
         else
-          scoreAndRankData['score'] = null
+          scoreAndRankData[@scoreKeyOption] = null
         if replies[1]?
-          scoreAndRankData['rank'] = replies[1] + 1
+          scoreAndRankData[@rankKeyOption] = replies[1] + 1
         else
-          scoreAndRankData['rank'] = null
-        scoreAndRankData['member'] = member
+          scoreAndRankData[@rankKeyOption] = null
+        scoreAndRankData[@memberKeyOption] = member
         callback(scoreAndRankData))
 
   ###
@@ -764,19 +773,19 @@ class Leaderboard
       for member, index in members
         do (member) =>
           data = {}
-          data['member'] = member
+          data[@memberKeyOption] = member
           unless options['members_only']
-            data['rank'] = replies[index * 2] + 1
+            data[@rankKeyOption] = replies[index * 2] + 1
             if replies[index * 2 + 1]
-              data['score'] = parseFloat(replies[index * 2 + 1])
+              data[@scoreKeyOption] = parseFloat(replies[index * 2 + 1])
             else
-              data['score'] = null
-              data['rank'] = null
+              data[@scoreKeyOption] = null
+              data[@rankKeyOption] = null
 
           # Retrieve optional member data based on options['with_member_data']
           if options['with_member_data']
             this.memberDataForIn leaderboardName, member, (memberdata) =>
-              data['member_data'] = memberdata
+              data[@memberDataKeyOption] = memberdata
               ranksForMembers.push(data)
               # Sort if options['sort_by']
               if ranksForMembers.length == members.length
