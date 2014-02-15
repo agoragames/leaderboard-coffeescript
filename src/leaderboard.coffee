@@ -18,6 +18,7 @@ class Leaderboard
     'rankKey': 'rank'
     'scoreKey': 'score'
     'memberDataKey': 'member_data'
+    'memberDataNamespace': 'member_data'
 
   ###
   # Default Redis host: localhost
@@ -53,6 +54,7 @@ class Leaderboard
     @rankKeyOption = options['rankKey'] || 'rank'
     @scoreKeyOption = options['scoreKey'] || 'score'
     @memberDataKeyOption = options['memberDataKey'] || 'member_data'
+    @memberDataNamespace = options['memberDataNamespace'] || 'member_data'
 
     @redisConnection = redisOptions['redis_connection']
 
@@ -1072,6 +1074,6 @@ class Leaderboard
   # @return a key in the form of +leaderboardName:member_data+
   ###
   memberDataKey: (leaderboardName) ->
-    "#{leaderboardName}:member_data"
+    "#{leaderboardName}:#{@memberDataNamespace}"
 
 module.exports = Leaderboard
