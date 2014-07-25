@@ -1,8 +1,8 @@
 {
   "name": "agoragames-leaderboard",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "author": "David Czarnecki <dczarnecki@agoragames.com>",
-  "description": "Leaderboards backed by Redis in CoffeeScript",
+  "description": "Leaderboards backed by Redis in JavaScript",
   "contributors": [
     {
       "name": "David Czarnecki",

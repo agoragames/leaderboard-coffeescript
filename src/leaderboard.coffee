@@ -1003,12 +1003,14 @@ class Leaderboard
   # @return a page of leaders from the named leaderboard around a given member. Returns an empty array for a non-existent member.
   ###
   aroundMeIn: (leaderboardName, member, options = {}, callback) ->
+    pageSize = options['page_size'] || @pageSize
+
     if @reverse
       @redisConnection.zrank(leaderboardName, member, (err, reply) =>
         if reply?
-          startingOffset = parseInt(Math.ceil(reply - (@pageSize / 2)))
+          startingOffset = parseInt(Math.ceil(reply - (pageSize / 2)))
           startingOffset = 0 if startingOffset < 0
-          endingOffset = (startingOffset + @pageSize) - 1
+          endingOffset = (startingOffset + pageSize) - 1
 
           @redisConnection.zrange(leaderboardName, startingOffset, endingOffset, (err, reply) =>
             this.rankedInListIn(leaderboardName, reply, options, callback))
@@ -1019,9 +1021,9 @@ class Leaderboard
     else
       @redisConnection.zrevrank(leaderboardName, member, (err, reply) =>
         if reply?
-          startingOffset = parseInt(Math.ceil(reply - (@pageSize / 2)))
+          startingOffset = parseInt(Math.ceil(reply - (pageSize / 2)))
           startingOffset = 0 if startingOffset < 0
-          endingOffset = (startingOffset + @pageSize) - 1
+          endingOffset = (startingOffset + pageSize) - 1
 
           @redisConnection.zrevrange(leaderboardName, startingOffset, endingOffset, (err, reply) =>
             this.rankedInListIn(leaderboardName, reply, options, callback))
