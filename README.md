@@ -1,6 +1,6 @@
 # leaderboard
 
-Leaderboards backed by [Redis](http://redis.io) in CoffeeScript.
+Leaderboards backed by [Redis](http://redis.io) in JavaScript.
 
 Builds off ideas proposed in http://www.agoragames.com/blog/2011/01/01/creating-high-score-tables-leaderboards-using-redis/.
 
@@ -128,6 +128,38 @@ You can pass various options to the calls `leaders`, `allLeaders`, `aroundMe`, `
 highscores.rankMemberAcross(['highscores', 'more_highscores'], 'david', 50000, { 'member_name': 'david' }, (reply) -> ...)
 ```
 
+### Alternate leaderboard types
+
+The leaderboard library offers 3 styles of ranking. This is only an issue for members with the same score in a leaderboard.
+
+Default: The `Leaderboard` class uses the default Redis sorted set ordering, whereby different members having the same score are ordered lexicographically. As per the Redis documentation on Redis sorted sets, "The lexicographic ordering used is binary, it compares strings as array of bytes."
+
+Tie ranking: The `TieRankingLeaderboard` subclass of `Leaderboard` allows you to define a leaderboard where members with the same score are given the same rank. For example, members in a leaderboard with the associated scores would have the ranks of:
+
+```
+| member     | score | rank |
+-----------------------------
+| member_1   | 50    | 1    |
+| member_2   | 50    | 1    |
+| member_3   | 30    | 2    |
+| member_4   | 30    | 2    |
+| member_5   | 10    | 3    |
+```
+
+The `TieRankingLeaderboard` accepts one additional option, `tiesNamespace` (default: ties), when initializing a new instance of this class. Please note that in its current implementation, the `TieRankingLeaderboard` class uses an additional sorted set to rank the scores, so please keep this in mind when you are doing any capacity planning for Redis with respect to memory usage.
+
+Competition ranking: The `CompetitionRankingLeaderboard` subclass of `Leaderboard` allows you to define a leaderboard where members with the same score will have the same rank, and then a gap is left in the ranking numbers. For example, members in a leaderboard with the associated scores would have the ranks of:
+
+```
+| member     | score | rank |
+-----------------------------
+| member_1   | 50    | 1    |
+| member_2   | 50    | 1    |
+| member_3   | 30    | 3    |
+| member_4   | 30    | 3    |
+| member_5   | 10    | 5    |
+```
+
 ## Performance Metrics
 
 You can view [performance metrics](https://github.com/agoragames/leaderboard#performance-metrics) for the
@@ -139,7 +171,7 @@ The following ports have been made of the [leaderboard gem](https://github.com/a
 
 Officially supported:
 
-* CoffeeScript: https://github.com/agoragames/leaderboard-coffeescript
+* JavaScript: https://github.com/agoragames/leaderboard-coffeescript
 * Python: https://github.com/agoragames/leaderboard-python
 * Ruby: https://github.com/agoragames/leaderboard
 

@@ -3,7 +3,7 @@ describe 'Leaderboard', ->
     @redisConnection = redis.createClient(6379, 'localhost')
 
   beforeEach ->
-    @leaderboard = new Leaderboard('highscores', Leaderboard.DEFAULT_OPTIONS)
+   @leaderboard = new Leaderboard('highscores', Leaderboard.DEFAULT_OPTIONS)
 
   afterEach ->
     @redisConnection.flushdb()
@@ -647,7 +647,7 @@ describe 'Leaderboard', ->
         member.should.have.keys('member'))
 
     @leaderboard.rankedInList(['member_1', 'member_20'], {'members_only': true}, (reply) ->
-      reply.lenght.should.equal(2)
+      reply.length.should.equal(2)
       for member in reply
         member.should.have.keys('member'))
 
