@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 1.7.0 (2014-07-28)
+## 1.8.0 (2014-07-28)
 
 * Fix `page_size` option for `aroundMe` call
 * Add support for tie handling in leaderboards [#13](https://github.com/agoragames/leaderboard-coffeescript/pull/13)
