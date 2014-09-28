@@ -1,3 +1,6 @@
 *.log
 node_modules
 *.rdb
+
+# Ignore swp files created by vim
+*.swp

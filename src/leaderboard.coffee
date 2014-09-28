@@ -42,7 +42,7 @@ class Leaderboard
   # Create a new instance of a leaderboard.
   #
   # @param leaderboardName [String] Name of the leaderboard.
-  # @param options [Hash] Options for the leaderboard such as +'page_size'+.
+  # @param options [Hash] Options for the leaderboard such as +'pageSize'+.
   # @param redisOptions [Hash] Options for configuring Redis.
   ###
   constructor: (@leaderboardName, options = DEFAULT_OPTIONS, redisOptions = DEFAULT_REDIS_OPTIONS) ->
@@ -837,7 +837,7 @@ class Leaderboard
   ###
   leadersIn: (leaderboardName, currentPage, options = {}, callback) ->
     currentPage = 1 if currentPage < 1
-    pageSize = options['page_size'] || @pageSize
+    pageSize =  options['page_size'] || options['pageSize'] || @pageSize
 
     this.totalPages(pageSize, (totalPages) =>
       if currentPage > totalPages
@@ -1003,7 +1003,7 @@ class Leaderboard
   # @return a page of leaders from the named leaderboard around a given member. Returns an empty array for a non-existent member.
   ###
   aroundMeIn: (leaderboardName, member, options = {}, callback) ->
-    pageSize = options['page_size'] || @pageSize
+    pageSize = options['page_size'] || options['pageSize'] ||  @pageSize
 
     if @reverse
       @redisConnection.zrank(leaderboardName, member, (err, reply) =>
