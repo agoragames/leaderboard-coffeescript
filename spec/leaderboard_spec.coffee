@@ -42,7 +42,7 @@ describe 'Leaderboard', ->
     for index in [0...Leaderboard.DEFAULT_PAGE_SIZE + 1]
       @leaderboard.rankMember("member_#{index}", index, "member_data_#{index}", (reply) -> )
 
-    @leaderboard.leaders(1, {'with_member_data': true}, (reply) ->
+    @leaderboard.leaders(1, {'withMemberData': true}, (reply) ->
       reply.length.should.equal(25)
       reply[0]['member_custom'].should.equal('member_25')
       reply[0]['score_custom'].should.equal(25)
@@ -289,7 +289,7 @@ describe 'Leaderboard', ->
     @leaderboard.removeMembersOutsideRank(3, (reply) ->
       reply.should.equal(3))
 
-    @leaderboard.leaders(1, {'with_member_data': true}, (reply) ->
+    @leaderboard.leaders(1, {'withMemberData': true}, (reply) ->
       reply.length.should.equal(3)
       reply[0]['member'].should.equal('member_5')
       reply[2]['member'].should.equal('member_3'))
@@ -309,7 +309,7 @@ describe 'Leaderboard', ->
     reverse_leaderboard.removeMembersOutsideRank(3, (reply) ->
       reply.should.equal(2))
 
-    reverse_leaderboard.leaders(1, {'with_member_data': true}, (reply) ->
+    reverse_leaderboard.leaders(1, {'withMemberData': true}, (reply) ->
       reply.length.should.equal(3)
       reply[0]['member'].should.equal('member_0')
       reply[2]['member'].should.equal('member_2')
@@ -433,14 +433,14 @@ describe 'Leaderboard', ->
     @leaderboard.totalMembers((reply) ->
       reply.should.equal(26))
 
-    @leaderboard.leaders(1, {'with_member_data': true}, (reply) ->
+    @leaderboard.leaders(1, {'withMemberData': true}, (reply) ->
       reply[0].score.should.equal(25)
       reply[0].rank.should.equal(1)
       reply[0].member.should.equal('member_25')
       reply[0]['member_data'].should.equal('Optional member data for member 25')
       reply.length.should.equal(25))
 
-    @leaderboard.leaders(2, {'with_member_data': true}, (reply) ->
+    @leaderboard.leaders(2, {'withMemberData': true}, (reply) ->
       reply.length.should.equal(1)
       done())
 
@@ -621,32 +621,32 @@ describe 'Leaderboard', ->
     for index in [0..25]
       @leaderboard.rankMember("member_#{index}", index, "Optional member data for member #{index}", (reply) -> )
 
-    @leaderboard.leaders(1, {'members_only': true}, (reply) ->
+    @leaderboard.leaders(1, {'membersOnly': true}, (reply) ->
       reply[0].should.eql({'member': 'member_25'})
       for member in reply
         member.should.have.keys('member'))
 
-    @leaderboard.allLeaders({'members_only': true}, (reply) ->
+    @leaderboard.allLeaders({'membersOnly': true}, (reply) ->
       reply.length.should.equal(26)
       for member in reply
         member.should.have.keys('member'))
 
-    @leaderboard.membersFromScoreRange(10, 14, {'members_only': true}, (reply) ->
+    @leaderboard.membersFromScoreRange(10, 14, {'membersOnly': true}, (reply) ->
       reply.length.should.equal(5)
       for member in reply
         member.should.have.keys('member'))
 
-    @leaderboard.membersFromRankRange(1, 5, {'members_only': true}, (reply) ->
+    @leaderboard.membersFromRankRange(1, 5, {'membersOnly': true}, (reply) ->
       reply.length.should.equal(5)
       for member in reply
         member.should.have.keys('member'))
 
-    @leaderboard.aroundMe('member_10', {'page_size': 3, 'members_only': true}, (reply) ->
+    @leaderboard.aroundMe('member_10', {'pageSize': 3, 'membersOnly': true}, (reply) ->
       reply.length.should.equal(3)
       for member in reply
         member.should.have.keys('member'))
 
-    @leaderboard.rankedInList(['member_1', 'member_20'], {'members_only': true}, (reply) ->
+    @leaderboard.rankedInList(['member_1', 'member_20'], {'membersOnly': true}, (reply) ->
       reply.length.should.equal(2)
       for member in reply
         member.should.have.keys('member'))

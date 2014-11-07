@@ -55,37 +55,37 @@ highscores.rankFor('member_5', (memberRank) -> ...)
 Get page 1 in the leaderboard:
 
 ```javascript
-highscores.leaders(1, {'with_member_data': false}, (leaders) -> ...)
+highscores.leaders(1, {'withMemberData': false}, (leaders) -> ...)
 ```
 
 Get an "Around Me" leaderboard page for a given member, which pulls members above and below the given member:
 
 ```javascript
-highscores.aroundMe('member_25', {'with_member_data': false}, (leaders) -> ...)
+highscores.aroundMe('member_25', {'withMemberData': false}, (leaders) -> ...)
 ```
 
 Get rank and score for an arbitrary list of members (e.g. friends) from the leaderboard:
 
 ```javascript
-highscores.rankedInList(['member_5', 'member_17', 'member_1'], {'with_member_data': false}, (leaders) -> ...)
+highscores.rankedInList(['member_5', 'member_17', 'member_1'], {'withMemberData': false}, (leaders) -> ...)
 ```
 
 Retrieve members from the leaderboard in a given score range:
 
 ```javascript
-highscores.membersFromScoreRange(10, 15, {'with_member_data': false}, (leaders) -> ...)
+highscores.membersFromScoreRange(10, 15, {'withMemberData': false}, (leaders) -> ...)
 ```
 
 Retrieve a single member from the leaderboard at a given position:
 
 ```javascript
-highscores.memberAt(4, {'with_member_data': false}, (member) -> ...)
+highscores.memberAt(4, {'withMemberData': false}, (member) -> ...)
 ```
 
 Retrieve a range of members from the leaderboard within a given rank range:
 
 ```javascript
-highscores.membersFromRankRange(5, 9, {'with_member_data': false}, (leaders) -> ...)
+highscores.membersFromRankRange(5, 9, {'withMemberData': false}, (leaders) -> ...)
 ```
 
 ### Conditionally rank a member in the leaderboard
@@ -117,10 +117,10 @@ only returns the number of items removed. It does not return the members that it
 
 You can pass various options to the calls `leaders`, `allLeaders`, `aroundMe`, `membersFromScoreRange`, `membersFromRankRange` and `rankedInList`. Valid options are:
 
-* `with_member_data` - `true` or `false` to return the optional member data.
-* `page_size` - An integer value to change the page size for that call.
-* `members_only` - `true` or `false` to return only the members without their score and rank.
-* `sort_by` - Valid values for `sort_by` are `score` and `rank`.
+* `withMemberData` - `true` or `false` to return the optional member data.
+* `pageSize` - An integer value to change the page size for that call.
+* `membersOnly` - `true` or `false` to return only the members without their score and rank.
+* `sortBy` - Valid values for `sortBy` are `score` and `rank`.
 
 ### Ranking a member across multiple leaderboards
 

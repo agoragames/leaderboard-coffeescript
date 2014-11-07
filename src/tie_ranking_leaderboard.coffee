@@ -259,7 +259,7 @@ class TieRankingLeaderboard extends Leaderboard
     ranksForMembers = []
     transaction = @redisConnection.multi()
 
-    unless options['members_only']
+    unless options['membersOnly']
       for member in members
         if @reverse
           transaction.zrank(leaderboardName, member)
@@ -272,24 +272,24 @@ class TieRankingLeaderboard extends Leaderboard
         do (member) =>
           data = {}
           data[@memberKeyOption] = member
-          unless options['members_only']
+          unless options['membersOnly']
             if replies[index * 2 + 1]
               data[@scoreKeyOption] = parseFloat(replies[index * 2 + 1])
             else
               data[@scoreKeyOption] = null
               data[@rankKeyOption] = null
 
-          # Retrieve optional member data based on options['with_member_data']
-          if options['with_member_data']
+          # Retrieve optional member data based on options['withMemberData']
+          if options['withMemberData']
             this.memberDataForIn leaderboardName, member, (memberdata) =>
               data[@memberDataKeyOption] = memberdata
               if @reverse
                 @redisConnection.zrank(this.tiesLeaderboardKey(leaderboardName), data[@scoreKeyOption], (err, reply) =>
                   data[@rankKeyOption] = reply + 1
                   ranksForMembers.push(data)
-                  # Sort if options['sort_by']
+                  # Sort if options['sortBy']
                   if ranksForMembers.length == members.length
-                    switch options['sort_by']
+                    switch options['sortBy']
                       when 'rank'
                         ranksForMembers.sort((a, b) ->
                           a.rank > b.rank)
@@ -301,9 +301,9 @@ class TieRankingLeaderboard extends Leaderboard
                 @redisConnection.zrevrank(this.tiesLeaderboardKey(leaderboardName), data[@scoreKeyOption], (err, reply) =>
                   data[@rankKeyOption] = reply + 1
                   ranksForMembers.push(data)
-                  # Sort if options['sort_by']
+                  # Sort if options['sortBy']
                   if ranksForMembers.length == members.length
-                    switch options['sort_by']
+                    switch options['sortBy']
                       when 'rank'
                         ranksForMembers.sort((a, b) ->
                           a.rank > b.rank)
@@ -316,9 +316,9 @@ class TieRankingLeaderboard extends Leaderboard
               @redisConnection.zrank(this.tiesLeaderboardKey(leaderboardName), data[@scoreKeyOption], (err, reply) =>
                 data[@rankKeyOption] = reply + 1
                 ranksForMembers.push(data)
-                # Sort if options['sort_by']
+                # Sort if options['sortBy']
                 if ranksForMembers.length == members.length
-                  switch options['sort_by']
+                  switch options['sortBy']
                     when 'rank'
                       ranksForMembers.sort((a, b) ->
                         a.rank > b.rank)
@@ -330,9 +330,9 @@ class TieRankingLeaderboard extends Leaderboard
               @redisConnection.zrevrank(this.tiesLeaderboardKey(leaderboardName), data[@scoreKeyOption], (err, reply) =>
                 data[@rankKeyOption] = reply + 1
                 ranksForMembers.push(data)
-                # Sort if options['sort_by']
+                # Sort if options['sortBy']
                 if ranksForMembers.length == members.length
-                  switch options['sort_by']
+                  switch options['sortBy']
                     when 'rank'
                       ranksForMembers.sort((a, b) ->
                         a.rank > b.rank)

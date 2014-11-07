@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 2.0.0 (2014-11-07)
+
+* Changed `page_size` request option to `pageSize`.
+* Changed `with_member_data` request option to `withMemberData`.
+* Changed `members_only` request option to `membersOnly`.
+* Changed `sort_by` request option to be `sortBy`.
+
 ## 1.8.0 (2014-07-28)
 
 * Fix `page_size` option for `aroundMe` call
