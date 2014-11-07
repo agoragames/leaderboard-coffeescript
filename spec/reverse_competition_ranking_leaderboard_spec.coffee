@@ -107,3 +107,19 @@ describe 'CompetitionRankingLeaderboard (reverse)', ->
     @leaderboard.scoreAndRankFor('member_2', (data) ->
       data['rank'].should.equal(2)
       done())
+
+  it 'should have the correct rankings and scores when using #changeScoreFor', (done) ->
+    @leaderboard.rankMember('member_1', 50, 'member_data_1', (reply) -> )
+    @leaderboard.rankMember('member_2', 50, 'member_data_2', (reply) -> )
+    @leaderboard.rankMember('member_3', 30, 'member_data_3', (reply) -> )
+    @leaderboard.rankMember('member_4', 30, 'member_data_4', (reply) -> )
+    @leaderboard.rankMember('member_5', 10, 'member_data_5', (reply) -> )
+    @leaderboard.changeScoreFor('member_3', 10, (reply) -> )
+
+    @leaderboard.rankFor('member_3', (rank) ->
+      rank.should.equal(3))
+    @leaderboard.rankFor('member_4', (rank) ->
+      rank.should.equal(2))
+    @leaderboard.scoreFor('member_3', (score) ->
+      score.should.equal(40.0)
+      done())

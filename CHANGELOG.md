@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.1.0 (2014-11-08)
+
+* Add support for `changeScoreFor(...)` in the `TieRankingLeaderboard` class.
+
 ## 2.0.0 (2014-11-07)
 
 * Changed `page_size` request option to `pageSize`.

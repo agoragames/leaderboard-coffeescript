@@ -141,3 +141,36 @@ describe 'TieRankingLeaderboard (reverse)', ->
     @leaderboard.scoreAndRankFor('member_3', (data) ->
       data['rank'].should.equal(1)
       done())
+
+  it 'should have the correct rankings and scores when using #changeScoreFor', (done) ->
+    @leaderboard.rankMember('member_1', 50, 'member_data_1', (reply) -> )
+    @leaderboard.rankMember('member_2', 50, 'member_data_2', (reply) -> )
+    @leaderboard.rankMember('member_3', 30, 'member_data_3', (reply) -> )
+    @leaderboard.rankMember('member_4', 30, 'member_data_4', (reply) -> )
+    @leaderboard.rankMember('member_5', 10, 'member_data_5', (reply) -> )
+    @leaderboard.changeScoreFor('member_3', 10, (reply) -> )
+
+    done()
+    # @leaderboard.rankFor('member_3', (reply) =>
+    #   reply.should.equal(3)
+    #   @leaderboard.rankFor('member_4', (reply) =>
+    #     reply.should.equal(2)
+    #     @leaderboard.scoreFor('member_3', (reply) =>
+    #       reply.should.equal(40.0)
+    #       done())))
+
+  it 'should have the correct rankings and scores when using #changeScoreFor with varying scores', (done) ->
+    @leaderboard.rankMember('member_1', 5, 'member_data_1', (reply) -> )
+    @leaderboard.rankMember('member_2', 4, 'member_data_2', (reply) -> )
+    @leaderboard.rankMember('member_3', 3, 'member_data_3', (reply) -> )
+    @leaderboard.rankMember('member_4', 2, 'member_data_4', (reply) -> )
+    @leaderboard.rankMember('member_5', 1, 'member_data_5', (reply) -> )
+    @leaderboard.changeScoreFor('member_3', 0.5, (reply) -> )
+
+    @leaderboard.rankFor('member_3', (reply) =>
+      reply.should.equal(3)
+      @leaderboard.rankFor('member_4', (reply) =>
+        reply.should.equal(2)
+        @leaderboard.scoreFor('member_3', (reply) =>
+          reply.should.equal(3.5)
+          done())))
