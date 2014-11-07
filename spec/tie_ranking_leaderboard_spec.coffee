@@ -39,7 +39,7 @@ describe 'TieRankingLeaderboard', ->
     @leaderboard.rankMember('member_4', 30, 'member_data_4', (reply) -> )
     @leaderboard.rankMember('member_5', 10, 'member_data_5', (reply) -> )
 
-    @leaderboard.leaders(1, {'with_member_data': true}, (reply) ->
+    @leaderboard.leaders(1, {'withMemberData': true}, (reply) ->
       reply.length.should.equal(5)
       reply[0]['rank'].should.equal(1)
       reply[1]['rank'].should.equal(1)
@@ -60,13 +60,13 @@ describe 'TieRankingLeaderboard', ->
     @leaderboard.rankMember('member_9', 30, 'member_data_4', (reply) -> )
     @leaderboard.rankMember('member_10', 10, 'member_data_5', (reply) -> )
 
-    @leaderboard.leaders(1, {'with_member_data': true, 'page_size': 3}, (reply) ->
+    @leaderboard.leaders(1, {'withMemberData': true, 'pageSize': 3}, (reply) ->
       reply.length.should.equal(3)
       reply[0]['rank'].should.equal(1)
       reply[1]['rank'].should.equal(1)
       reply[2]['rank'].should.equal(1))
 
-    @leaderboard.leaders(2, {'with_member_data': true, 'page_size': 3}, (reply) ->
+    @leaderboard.leaders(2, {'withMemberData': true, 'pageSize': 3}, (reply) ->
       reply.length.should.equal(3)
       reply[0]['rank'].should.equal(1)
       reply[1]['rank'].should.equal(2)
@@ -85,7 +85,7 @@ describe 'TieRankingLeaderboard', ->
     @leaderboard.rankMember('member_9', 30, 'member_data_4', (reply) -> )
     @leaderboard.rankMember('member_10', 10, 'member_data_5', (reply) -> )
 
-    @leaderboard.aroundMe('member_3', {'with_member_data': true, 'page_size': 3}, (reply) ->
+    @leaderboard.aroundMe('member_3', {'withMemberData': true, 'pageSize': 3}, (reply) ->
       reply.length.should.equal(3)
       reply[0]['rank'].should.equal(2)
       reply[1]['rank'].should.equal(2)

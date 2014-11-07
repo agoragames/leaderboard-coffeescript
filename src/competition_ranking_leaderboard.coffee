@@ -80,7 +80,7 @@ class CompetitionRankingLeaderboard extends Leaderboard
     ranksForMembers = []
     transaction = @redisConnection.multi()
 
-    unless options['members_only']
+    unless options['membersOnly']
       for member in members
         if @reverse
           transaction.zrank(leaderboardName, member)
@@ -93,24 +93,24 @@ class CompetitionRankingLeaderboard extends Leaderboard
         do (member) =>
           data = {}
           data[@memberKeyOption] = member
-          unless options['members_only']
+          unless options['membersOnly']
             if replies[index * 2 + 1]
               data[@scoreKeyOption] = parseFloat(replies[index * 2 + 1])
             else
               data[@scoreKeyOption] = null
               data[@rankKeyOption] = null
 
-          # Retrieve optional member data based on options['with_member_data']
-          if options['with_member_data']
+          # Retrieve optional member data based on options['withMemberData']
+          if options['withMemberData']
             this.memberDataForIn leaderboardName, member, (memberdata) =>
               data[@memberDataKeyOption] = memberdata
               if @reverse
                 @redisConnection.zcount(leaderboardName, '-inf', "(#{data[@scoreKeyOption]}", (err, count) =>
                   data[@rankKeyOption] = count + 1
                   ranksForMembers.push(data)
-                  # Sort if options['sort_by']
+                  # Sort if options['sortBy']
                   if ranksForMembers.length == members.length
-                    switch options['sort_by']
+                    switch options['sortBy']
                       when 'rank'
                         ranksForMembers.sort((a, b) ->
                           a.rank > b.rank)
@@ -122,9 +122,9 @@ class CompetitionRankingLeaderboard extends Leaderboard
                 @redisConnection.zcount(leaderboardName, "(#{data[@scoreKeyOption]}", '+inf', (err, count) =>
                   data[@rankKeyOption] = count + 1
                   ranksForMembers.push(data)
-                  # Sort if options['sort_by']
+                  # Sort if options['sortBy']
                   if ranksForMembers.length == members.length
-                    switch options['sort_by']
+                    switch options['sortBy']
                       when 'rank'
                         ranksForMembers.sort((a, b) ->
                           a.rank > b.rank)
@@ -137,9 +137,9 @@ class CompetitionRankingLeaderboard extends Leaderboard
               @redisConnection.zcount(leaderboardName, '-inf', "(#{data[@scoreKeyOption]}", (err, count) =>
                 data[@rankKeyOption] = count + 1
                 ranksForMembers.push(data)
-                # Sort if options['sort_by']
+                # Sort if options['sortBy']
                 if ranksForMembers.length == members.length
-                  switch options['sort_by']
+                  switch options['sortBy']
                     when 'rank'
                       ranksForMembers.sort((a, b) ->
                         a.rank > b.rank)
@@ -151,9 +151,9 @@ class CompetitionRankingLeaderboard extends Leaderboard
               @redisConnection.zcount(leaderboardName, "(#{data[@scoreKeyOption]}", '+inf', (err, count) =>
                 data[@rankKeyOption] = count + 1
                 ranksForMembers.push(data)
-                # Sort if options['sort_by']
+                # Sort if options['sortBy']
                 if ranksForMembers.length == members.length
-                  switch options['sort_by']
+                  switch options['sortBy']
                     when 'rank'
                       ranksForMembers.sort((a, b) ->
                         a.rank > b.rank)

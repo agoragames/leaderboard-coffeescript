@@ -42,7 +42,7 @@ class Leaderboard
   # Create a new instance of a leaderboard.
   #
   # @param leaderboardName [String] Name of the leaderboard.
-  # @param options [Hash] Options for the leaderboard such as +'page_size'+.
+  # @param options [Hash] Options for the leaderboard such as +'pageSize'+.
   # @param redisOptions [Hash] Options for configuring Redis.
   ###
   constructor: (@leaderboardName, options = DEFAULT_OPTIONS, redisOptions = DEFAULT_REDIS_OPTIONS) ->
@@ -763,7 +763,7 @@ class Leaderboard
     ranksForMembers = []
     transaction = @redisConnection.multi()
 
-    unless options['members_only']
+    unless options['membersOnly']
       for member in members
         if @reverse
           transaction.zrank(leaderboardName, member)
@@ -776,7 +776,7 @@ class Leaderboard
         do (member) =>
           data = {}
           data[@memberKeyOption] = member
-          unless options['members_only']
+          unless options['membersOnly']
             data[@rankKeyOption] = replies[index * 2] + 1
             if replies[index * 2 + 1]
               data[@scoreKeyOption] = parseFloat(replies[index * 2 + 1])
@@ -784,14 +784,14 @@ class Leaderboard
               data[@scoreKeyOption] = null
               data[@rankKeyOption] = null
 
-          # Retrieve optional member data based on options['with_member_data']
-          if options['with_member_data']
+          # Retrieve optional member data based on options['withMemberData']
+          if options['withMemberData']
             this.memberDataForIn leaderboardName, member, (memberdata) =>
               data[@memberDataKeyOption] = memberdata
               ranksForMembers.push(data)
-              # Sort if options['sort_by']
+              # Sort if options['sortBy']
               if ranksForMembers.length == members.length
-                switch options['sort_by']
+                switch options['sortBy']
                   when 'rank'
                     ranksForMembers.sort((a, b) ->
                       a.rank > b.rank)
@@ -801,9 +801,9 @@ class Leaderboard
                 callback(ranksForMembers)
           else
             ranksForMembers.push(data)
-            # Sort if options['sort_by']
+            # Sort if options['sortBy']
             if ranksForMembers.length == members.length
-              switch options['sort_by']
+              switch options['sortBy']
                 when 'rank'
                   ranksForMembers.sort((a, b) ->
                     a.rank > b.rank)
@@ -837,7 +837,7 @@ class Leaderboard
   ###
   leadersIn: (leaderboardName, currentPage, options = {}, callback) ->
     currentPage = 1 if currentPage < 1
-    pageSize = options['page_size'] || @pageSize
+    pageSize = options['pageSize'] || @pageSize
 
     this.totalPages(pageSize, (totalPages) =>
       if currentPage > totalPages
@@ -1003,7 +1003,7 @@ class Leaderboard
   # @return a page of leaders from the named leaderboard around a given member. Returns an empty array for a non-existent member.
   ###
   aroundMeIn: (leaderboardName, member, options = {}, callback) ->
-    pageSize = options['page_size'] || @pageSize
+    pageSize = options['pageSize'] || @pageSize
 
     if @reverse
       @redisConnection.zrank(leaderboardName, member, (err, reply) =>

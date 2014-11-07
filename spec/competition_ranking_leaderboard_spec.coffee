@@ -15,7 +15,7 @@ describe 'CompetitionRankingLeaderboard', ->
     @leaderboard.rankMember('member_4', 30, 'member_data_4', (reply) -> )
     @leaderboard.rankMember('member_5', 10, 'member_data_5', (reply) -> )
 
-    @leaderboard.leaders(1, {'with_member_data': true}, (reply) ->
+    @leaderboard.leaders(1, {'withMemberData': true}, (reply) ->
       reply.length.should.equal(5)
       reply[0]['rank'].should.equal(1)
       reply[1]['rank'].should.equal(1)
@@ -36,13 +36,13 @@ describe 'CompetitionRankingLeaderboard', ->
     @leaderboard.rankMember('member_9', 30, 'member_data_4', (reply) -> )
     @leaderboard.rankMember('member_10', 10, 'member_data_5', (reply) -> )
 
-    @leaderboard.leaders(1, {'with_member_data': true, 'page_size': 3}, (reply) ->
+    @leaderboard.leaders(1, {'withMemberData': true, 'pageSize': 3}, (reply) ->
       reply.length.should.equal(3)
       reply[0]['rank'].should.equal(1)
       reply[1]['rank'].should.equal(1)
       reply[2]['rank'].should.equal(1))
 
-    @leaderboard.leaders(2, {'with_member_data': true, 'page_size': 3}, (reply) ->
+    @leaderboard.leaders(2, {'withMemberData': true, 'pageSize': 3}, (reply) ->
       reply.length.should.equal(3)
       reply[0]['rank'].should.equal(1)
       reply[1]['rank'].should.equal(5)
@@ -61,7 +61,7 @@ describe 'CompetitionRankingLeaderboard', ->
     @leaderboard.rankMember('member_5', 10, 'member_data_5', (reply) -> )
     @leaderboard.rankMember('member_10', 10, 'member_data_10', (reply) -> )
 
-    @leaderboard.aroundMe('member_4', {'with_member_data': true}, (reply) ->
+    @leaderboard.aroundMe('member_4', {'withMemberData': true}, (reply) ->
       reply.length.should.equal(10)
       reply[0]['rank'].should.equal(1)
       reply[4]['rank'].should.equal(5)
