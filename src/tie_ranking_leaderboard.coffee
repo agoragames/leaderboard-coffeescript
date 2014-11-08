@@ -59,6 +59,29 @@ class TieRankingLeaderboard extends Leaderboard
       callback(reply) if callback)
 
   ###
+  # Change the score for a member in the named leaderboard by a delta which can be positive or negative.
+  #
+  # @param leaderboardName [String] Name of the leaderboard.
+  # @param member [String] Member name.
+  # @param delta [float] Score change.
+  # @param callback Optional callback for result of call.
+  ###
+  changeScoreForMemberIn: (leaderboardName, member, delta, callback) ->
+    this.scoreFor(member, (score) =>
+      newScore = score + delta
+      @redisConnection.zrevrangebyscore(leaderboardName, score, score, (err, totalMembers) =>
+        transaction = @redisConnection.multi()
+        transaction.zadd(leaderboardName, newScore, member)
+        transaction.zadd(this.tiesLeaderboardKey(leaderboardName), newScore, newScore)
+        transaction.exec((err, reply) =>
+          if totalMembers.length == 1
+            @redisConnection.zrem(this.tiesLeaderboardKey(leaderboardName), score)
+          callback(reply) if callback
+        )
+      )
+    )
+
+  ###
   # Rank a member in the named leaderboard.
   #
   # @param leaderboardName [String] Name of the leaderboard.
