@@ -150,14 +150,13 @@ describe 'TieRankingLeaderboard (reverse)', ->
     @leaderboard.rankMember('member_5', 10, 'member_data_5', (reply) -> )
     @leaderboard.changeScoreFor('member_3', 10, (reply) -> )
 
-    done()
-    # @leaderboard.rankFor('member_3', (reply) =>
-    #   reply.should.equal(3)
-    #   @leaderboard.rankFor('member_4', (reply) =>
-    #     reply.should.equal(2)
-    #     @leaderboard.scoreFor('member_3', (reply) =>
-    #       reply.should.equal(40.0)
-    #       done())))
+    @leaderboard.rankFor('member_4', (reply) =>
+      reply.should.equal(2)
+      @leaderboard.rankFor('member_3', (reply) =>
+        reply.should.equal(3)
+        @leaderboard.scoreFor('member_3', (reply) =>
+          reply.should.equal(40.0)
+          done())))
 
   it 'should have the correct rankings and scores when using #changeScoreFor with varying scores', (done) ->
     @leaderboard.rankMember('member_1', 5, 'member_data_1', (reply) -> )
