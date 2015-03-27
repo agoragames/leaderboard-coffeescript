@@ -31,12 +31,18 @@ class Leaderboard
   @DEFAULT_REDIS_PORT = 6379
 
   ###
+  # Default Redis options: none
+  ###
+  @DEFAULT_REDIS_OPTIONS = {}
+
+  ###
   # Default Redis options when creating a connection to Redis. The
   # +DEFAULT_REDIS_HOST+ and +DEFAULT_REDIS_PORT+ will be passed.
   ###
   DEFAULT_REDIS_OPTIONS =
     'host': @DEFAULT_REDIS_HOST
     'port': @DEFAULT_REDIS_PORT
+    'options': @DEFAULT_REDIS_OPTIONS
 
   ###
   # Create a new instance of a leaderboard.
@@ -61,7 +67,9 @@ class Leaderboard
     if @redisConnection?
       delete redisOptions['redis_connection']
 
-    @redisConnection = redis.createClient(redisOptions['port'], redisOptions['host']) unless @redisConnection?
+    @redisConnection = redis.createClient(redisOptions['port'], redisOptions['host'], redisOptions['options']) unless @redisConnection?
+    if redisOptions.hasOwnProperty('auth_pass')
+      @redisConnection.auth(redisOptions.options.auth_pass)
 
   ###
   # Disconnect the Redis connection.
