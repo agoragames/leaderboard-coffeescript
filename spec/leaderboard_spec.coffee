@@ -111,6 +111,17 @@ describe 'Leaderboard', ->
       reply.should.equal('Optional member data')
       done())
 
+    it 'should allow you to store and retrieve optional member data as object', (done) ->
+      data = {
+        index: 3,
+        data: 'Optional member data'
+      }
+      @leaderboard.rankMember('member', 1, data, (reply) -> )
+
+      @leaderboard.memberDataFor('member', (reply) ->
+        reply.should.equal(data)
+        done())
+
   it 'should allow you to update optional member data', (done) ->
     @leaderboard.rankMember('member', 1, 'Optional member data', (reply) -> )
 
