@@ -222,7 +222,8 @@ class Leaderboard
   # @return String of optional member data.
   ###
   memberDataForIn: (leaderboardName, member, callback) ->
-    @redisConnection.hget(this.memberDataKey(leaderboardName), member, (err, reply) ->
+    @redisConnection.hget(this.memberDataKey(leaderboardName), member, (err, reply) =>
+      result = if this.isJsonData(reply) then JSON.parse(reply) else reply
       callback(reply))
 
   ###
@@ -244,6 +245,7 @@ class Leaderboard
   # @param callback Optional callback for result of call.
   ###
   updateMemberDataFor: (leaderboardName, member, memberData, callback) ->
+    data = if typeof memberdata is 'object' then JSON.stringify(memberData) else memberData
     @redisConnection.hset(this.memberDataKey(leaderboardName), member, memberData, (err, reply) ->
       callback(reply) if callback)
 
@@ -1077,5 +1079,21 @@ class Leaderboard
   ###
   memberDataKey: (leaderboardName) ->
     "#{leaderboardName}:#{@memberDataNamespace}"
+
+  ###
+  # Checks a string if encoded json
+  #
+  # @param value [String] String to be checked.
+  #
+  # @return boolean of string is json
+  ###
+  isJsonData: (value) ->
+    try
+      JSON.parse(str);
+    catch e
+        return false
+    return true
+
+
 
 module.exports = Leaderboard
