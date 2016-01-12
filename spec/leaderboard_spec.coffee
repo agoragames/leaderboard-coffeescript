@@ -50,7 +50,7 @@ describe 'Leaderboard', ->
       reply[0]['member_data_custom'].should.equal('member_data_25')
       done())
 
-  it.only 'should allow you to change the memberDataNamespace option', (done) ->
+  it 'should allow you to change the memberDataNamespace option', (done) ->
     updated_options =
       'memberDataNamespace': 'md'
 
