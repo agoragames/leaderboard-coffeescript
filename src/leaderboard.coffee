@@ -55,6 +55,7 @@ class Leaderboard
     @scoreKeyOption = options['scoreKey'] || 'score'
     @memberDataKeyOption = options['memberDataKey'] || 'member_data'
     @memberDataNamespace = options['memberDataNamespace'] || 'member_data'
+    @useGlobalMemberData = if (options['useGlobalMemberData']) then true else false
 
     @redisConnection = redisOptions['redis_connection']
 
@@ -1076,6 +1077,6 @@ class Leaderboard
   # @return a key in the form of +leaderboardName:member_data+
   ###
   memberDataKey: (leaderboardName) ->
-    "#{leaderboardName}:#{@memberDataNamespace}"
+    return if @useGlobalMemberData then "#{@memberDataNamespace}" else "#{leaderboardName}:#{@memberDataNamespace}"
 
 module.exports = Leaderboard

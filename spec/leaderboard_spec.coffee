@@ -50,7 +50,7 @@ describe 'Leaderboard', ->
       reply[0]['member_data_custom'].should.equal('member_data_25')
       done())
 
-  it 'should allow you to change the memberDataNamespace option', (done) ->
+  it.only 'should allow you to change the memberDataNamespace option', (done) ->
     updated_options =
       'memberDataNamespace': 'md'
 
@@ -63,6 +63,23 @@ describe 'Leaderboard', ->
     @leaderboard.redisConnection.exists('highscores:md', (err, reply) ->
       reply.should.equal(1)
       done())
+
+    it 'should allow you to change the memberDataNamespace to global namespace', (done) ->
+      updated_options =
+        'memberDataNamespace': 'global:namespace'
+        'useGlobalMemberData': true
+
+      @leaderboard = new Leaderboard('highscores', updated_options)
+      for index in [0...Leaderboard.DEFAULT_PAGE_SIZE + 1]
+        @leaderboard.rankMember("member_#{index}", index, "member_data_#{index}", (reply) -> )
+
+      @leaderboard.redisConnection.exists('highscores:member_data', (err, reply) ->
+        reply.should.equal(0))
+      @leaderboard.redisConnection.exists('highscores:global:namespace', (err, reply) ->
+        reply.should.equal(0))
+      @leaderboard.redisConnection.exists('global:namespace', (err, reply) ->
+        reply.should.equal(1)
+        done())
 
   it 'should allow you to disconnect the Redis connection', (done) ->
     @leaderboard.disconnect()
