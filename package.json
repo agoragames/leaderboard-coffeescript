@@ -19,7 +19,7 @@
     "redis"
   ],
   "dependencies": {
-    "redis": "~ 0.8",
+    "redis": "^2.6.1",
     "coffee-script": ">= 1.4.0"
   },
   "devDependencies": {
