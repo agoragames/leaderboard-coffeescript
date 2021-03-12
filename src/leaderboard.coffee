@@ -112,8 +112,9 @@ class Leaderboard
   ###
   rankMemberIn: (leaderboardName, member, score, memberData = null, callback) ->
     transaction = @redisConnection.multi()
+    data = if typeof memberData is 'object' then JSON.stringify(memberData) else memberData
     transaction.zadd(leaderboardName, score, member)
-    transaction.hset(this.memberDataKey(leaderboardName), member, memberData) if memberData?
+    transaction.hset(this.memberDataKey(leaderboardName), member, data) if memberData?
     transaction.exec((err, reply) ->
       callback(reply) if callback)
 
@@ -126,10 +127,11 @@ class Leaderboard
   # @param member_data [String] Optional member data.
   ###
   rankMemberAcross: (leaderboardNames, member, score, memberData = null, callback) ->
+    data = if typeof memberData is 'object' then JSON.stringify(memberData) else memberData
     transaction = @redisConnection.multi()
     for leaderboardName in leaderboardNames
       transaction.zadd(leaderboardName, score, member)
-      transaction.hset(this.memberDataKey(leaderboardName), member, memberData) if memberData?
+      transaction.hset(this.memberDataKey(leaderboardName), member, data) if memberData?
     transaction.exec((err, reply) ->
       callback(reply) if callback)
 
@@ -222,8 +224,9 @@ class Leaderboard
   # @return String of optional member data.
   ###
   memberDataForIn: (leaderboardName, member, callback) ->
-    @redisConnection.hget(this.memberDataKey(leaderboardName), member, (err, reply) ->
-      callback(reply))
+    @redisConnection.hget(this.memberDataKey(leaderboardName), member, (err, reply) =>
+      result = if this.isJsonData(reply) then JSON.parse(reply) else reply
+      callback(result))
 
   ###
   # Update the optional member data for a given member in the leaderboard.
@@ -244,7 +247,8 @@ class Leaderboard
   # @param callback Optional callback for result of call.
   ###
   updateMemberDataFor: (leaderboardName, member, memberData, callback) ->
-    @redisConnection.hset(this.memberDataKey(leaderboardName), member, memberData, (err, reply) ->
+    data = if typeof memberData is 'object' then JSON.stringify(memberData) else memberData
+    @redisConnection.hset(this.memberDataKey(leaderboardName), member, data, (err, reply) ->
       callback(reply) if callback)
 
   ###
@@ -1077,5 +1081,21 @@ class Leaderboard
   ###
   memberDataKey: (leaderboardName) ->
     "#{leaderboardName}:#{@memberDataNamespace}"
+
+  ###
+  # Checks a string if encoded json
+  #
+  # @param value [String] String to be checked.
+  #
+  # @return boolean of string is json
+  ###
+  isJsonData: (value) ->
+    try
+      JSON.parse(value);
+    catch e
+        return false
+    return true
+
+
 
 module.exports = Leaderboard
